@@ -1,0 +1,22 @@
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback');
+
+// Variables
+@import 'variables'; // Ensure 'variables.scss' exists in resources/sass
+
+// Bootstrap
+@import 'bootstrap/scss/bootstrap'; // Only need this import
+
+
+
+// AdminLTE
+@import 'admin-lte/dist/css/adminlte.min.css'; // Make sure AdminLTE is installed and the path is correct
+
+// Font Awesome
+@import '@fortawesome/fontawesome-free/css/all.min.css';
+@import '@fortawesome/fontawesome-free/css/solid.min.css';
+@import '@fortawesome/fontawesome-free/css/regular.min.css';
+@import '@fortawesome/fontawesome-free/css/brands.min.css';
+
+// Custom styles
+

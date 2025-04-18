@@ -36,8 +36,8 @@
 
   <!-- Preloader -->
   <div class="preloader flex-column justify-content-center align-items-center">
-    <img class="animation__shake" src="dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
-  </div>
+  <i class="fas fa-spinner fa-spin fa-3x text-primary"></i>
+</div>
 
   <!-- Navbar -->
   <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -77,6 +77,16 @@
           </form>
         </div>
       </li>
+
+      <!-- Logout Button -->
+      <li class="nav-item d-none d-sm-inline-block">
+        <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button type="submit" class="nav-link btn btn-link text-danger p-0" style="border: none;">
+            Logout
+        </button>
+         </form>
+        </li>
 
       <!-- Messages Dropdown Menu -->
       <li class="nav-item dropdown">
@@ -182,7 +192,7 @@
     <!-- Brand Logo -->
     <a href="index3.html" class="brand-link">
     <img src="{{ asset('vendor/adminlte/dist/img/AdminLTELogo.png') }}"  alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-      <span class="brand-text font-weight-light">AdminLTE 3</span>
+      <span class="brand-text font-weight-light">Admin Pannel</span>
     </a>
 
     <!-- Sidebar -->
@@ -193,21 +203,13 @@
         <img src="{{ asset('vendor/adminlte/dist/img/user1-128x128.jpg') }}"  class="img-circle elevation-2" alt="User Image">
         </div>
         <div class="info">
-          <a href="#" class="d-block">Yassine jouini</a>
+          <a href="#" class="d-block">{{ Auth::user()->name }}</a>
+          
         </div>
       </div>
 
       <!-- SidebarSearch Form -->
-      <div class="form-inline">
-        <div class="input-group" data-widget="sidebar-search">
-          <input class="form-control form-control-sidebar" type="search" placeholder="Search" aria-label="Search">
-          <div class="input-group-append">
-            <button class="btn btn-sidebar">
-              <i class="fas fa-search fa-fw"></i>
-            </button>
-          </div>
-        </div>
-      </div>
+
 
       <!-- Sidebar Menu -->
       <nav class="mt-2">
@@ -293,10 +295,7 @@
             <h1 class="m-0">Dashboard</h1>
           </div><!-- /.col -->
           <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">Home</a></li>
-              <li class="breadcrumb-item active">Dashboard v1</li>
-            </ol>
+        
           </div><!-- /.col -->
         </div><!-- /.row -->
       </div><!-- /.container-fluid -->
