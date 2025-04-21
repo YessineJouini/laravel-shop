@@ -5,6 +5,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Store | {{ config('app.name', 'Laravel') }}</title>
 
     <!-- Google Font: Source Sans Pro -->
@@ -20,6 +21,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/mainstyle.css') }}">
     <!-- Frontend CSS -->
     <link rel="stylesheet" href="{{ asset('assets/css/frontend.css') }}">
+    
 </head>
 <body class="hold-transition layout-top-nav">
 <div class="wrapper">
@@ -31,9 +33,15 @@
                 <a href="{{ route('store.index') }}" class="nav-link">
                     <strong>Store</strong>
                 </a>
+                
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('cart.view') }}" class="nav-link">
+                    <strong>Cart</strong>
+                </a>
             </li>
         </ul>
-
+       
         <!-- Right navbar links (user menu) -->
         <ul class="navbar-nav ml-auto">
                 @auth
@@ -69,7 +77,7 @@
 </div>
 
 <!-- jQuery -->
-<script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+<script src="{{asset('vendor/jquery/jquery.js')}}"></script>
 <!-- Bootstrap 4 -->
 <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 <!-- AdminLTE App -->

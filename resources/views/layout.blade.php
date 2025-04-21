@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  
+<meta name="csrf-token" content="{{ csrf_token() }}">
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AdminLTE 3 | Dashboard</title>
@@ -32,7 +32,7 @@
 <!-- Frontend CSS -->
 <link rel="stylesheet" href="{{ asset('assets/css/frontend.css') }}">
 <!-- AdminLTE CSS -->
-<link rel="stylesheet" href="{{ asset('vendor/admin-lte/dist/css/adminlte.min.css') }}">
+<link rel="stylesheet" href="{{ asset('vendor/adminlte/dist/css/adminlte.min.css') }}">
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed">
@@ -374,8 +374,11 @@
 <!-- AdminLTE dashboard demo (This is only for demo purposes) -->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-sparklines/2.1.2/jquery.sparkline.min.js"></script>
-<script src="{{asset('vendor/adminlte/dist/js/pages/dashboard.js')}}"></script>
+@if(Route::is('admin.dashboard'))
+  <script src="{{ asset('vendor/adminlte/dist/js/pages/dashboard.js') }}"></script>
+@endif
+
 <!-- AdminLTE JS -->
-<script src="{{ asset('vendor/admin-lte/dist/js/adminlte.min.js') }}"></script>
+<script src="{{ asset('vendor/adminlte/dist/js/adminlte.min.js') }}"></script>
 </body>
 </html>

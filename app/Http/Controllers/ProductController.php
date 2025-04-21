@@ -57,7 +57,7 @@ class ProductController extends Controller
             'image' => $imagePath,
         ]);
 
-        // Redirect to the product list with a success message
+        // success message
         return redirect()->route('products.index')->with('success', 'Product created successfully!');
     }
 
