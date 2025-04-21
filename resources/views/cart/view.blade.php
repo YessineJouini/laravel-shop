@@ -72,12 +72,10 @@
                   </h5>
                 </div>
                 <div class="col-sm-6 text-right">
-                  <form action="{{ route('cart.checkout') }}" method="POST" class="d-inline">
-                    @csrf
-                    <button type="submit" class="btn btn-success">
-                      <i class="fas fa-check mr-1"></i> Confirm Order
-                    </button>
-                  </form>
+                <a href="{{ route('cart.checkout.form') }}" class="btn btn-success">
+                    Proceed to Checkout
+                  </a>
+
                 </div>
               </div>
             </div>

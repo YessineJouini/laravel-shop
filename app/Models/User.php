@@ -31,7 +31,17 @@ class User extends Authenticatable
 {
     return $this->hasOne(Cart::class);
 }
-    
+public function addresses()
+{
+    return $this->hasMany(Address::class);
+}
+public function cartItems()
+{
+    return $this->hasManyThrough(CartItem::class, Cart::class, 'user_id', 'cart_id', 'id', 'id');
+}
+
+
+
 }
 
 $user = Auth::user(); // Ensure this is an instance of App\Models\User

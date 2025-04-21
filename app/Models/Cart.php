@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Cart extends Model
 {
@@ -24,4 +25,14 @@ class Cart extends Model
     {
         return $this->cartItems();
     }
+    public function view()
+{
+    $user = Auth::user();
+    $cart = $user->cart;
+
+    $cartItems = $cart ? $cart->items : collect(); // fallback if no cart exists
+
+    return view('cart.view', compact('cartItems'));
+}
+
 }
