@@ -220,11 +220,19 @@
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
           <!-- Add icons to the links using the .nav-icon class
                            with font-awesome or any other icon font library -->
+                           
                            <li class="nav-item">
     <a href="{{ url('/store') }}" class="nav-link {{ request()->is('store') ? 'active' : '' }}">
         <i class="nav-icon fas fa-store"></i>
         <p>Store</p>
     </a>
+</li>
+<li class="nav-item">
+  <a href="{{ route('orders.index') }}"
+     class="nav-link {{ request()->routeIs('orders.*') ? 'active' : '' }}">
+    <i class="nav-icon fas fa-file-invoice-dollar"></i>
+    <p>Order Management</p>
+  </a>
 </li>
           
           <!-- Admin Management Section -->
@@ -261,6 +269,7 @@
                   </li>
                 </ul>
               </li>
+              
 
               <!-- Products Submenu -->
               <li class="nav-item {{ request()->routeIs('products.*') ? 'menu-open' : '' }}">
@@ -319,6 +328,13 @@
         <!-- /.row (main row) -->
       </div><!-- /.container-fluid -->
     </section>
+    @if(session('success'))
+  <div class="alert alert-success">{{ session('success') }}</div>
+@endif
+
+@if(session('error'))
+  <div class="alert alert-danger">{{ session('error') }}</div>
+@endif  
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->

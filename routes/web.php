@@ -8,6 +8,7 @@ use App\Http\Controllers\StoreController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\OrderController;
 
 // Register alias for middleware (optional here if already in kernel)
 Route::aliasMiddleware('checkrole', \App\Http\Middleware\CheckRole::class);
@@ -26,6 +27,10 @@ Route::get('/admin', function () {
 Route::middleware(['auth', 'checkrole:admin'])->group(function () {
     Route::resource('categories', CategoryController::class);
     Route::resource('products', ProductController::class);
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::post('/orders/{order}/accept', [OrderController::class, 'accept'])->name('orders.accept');
+    Route::post('/orders/{order}/decline', [OrderController::class, 'decline'])->name('orders.decline');
 });
 
 // Public store routes
@@ -44,6 +49,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/cart/{productId}/add', [CartController::class, 'addToCart'])->name('cart.add');
     Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
     Route::get('/cart/checkout', [CartController::class, 'showCheckoutForm'])->name('cart.checkout.form');
+    Route::post('/cart/submit-order', [CartController::class, 'submitOrder'])->name('cart.submitOrder');
+    
+
 });
+Route::get('/order/confirmation/{order}', [CartController::class, 'showConfirmation'])->name('order.confirmation');
 
 
