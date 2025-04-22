@@ -10,7 +10,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\OrderController;
 
-// Register alias for middleware (optional here if already in kernel)
+// Register alias for middleware (optional if already in kernel)
 Route::aliasMiddleware('checkrole', \App\Http\Middleware\CheckRole::class);
 
 // Root redirect
@@ -18,12 +18,12 @@ Route::get('/', function () {
     return Auth::check() ? redirect()->route('store.index') : redirect()->route('login');
 });
 
-// Admin dashboard
+// Admin dashboard (for admin routes)
 Route::get('/admin', function () {
     return view('admin');
 })->middleware(['auth', 'checkrole:admin'])->name('admin.dashboard');
 
-// ✅ Admin-only routes
+// Admin-only routes
 Route::middleware(['auth', 'checkrole:admin'])->group(function () {
     Route::resource('categories', CategoryController::class);
     Route::resource('products', ProductController::class);
@@ -44,15 +44,13 @@ Auth::routes(['verify' => true]);
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Cart
+    // Cart Routes
     Route::get('/cart', [CartController::class, 'view'])->name('cart.view');
     Route::post('/cart/{productId}/add', [CartController::class, 'addToCart'])->name('cart.add');
-    Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
     Route::get('/cart/checkout', [CartController::class, 'showCheckoutForm'])->name('cart.checkout.form');
-    Route::post('/cart/submit-order', [CartController::class, 'submitOrder'])->name('cart.submitOrder');
-    
+    Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
 
 });
-Route::get('/order/confirmation/{order}', [CartController::class, 'showConfirmation'])->name('order.confirmation');
 
-
+// Order Confirmation (show after order is placed)
+Route::get('/order/confirmation/{order}', [CartController::class, 'showConfirmation'])->name('cart.confirmation');

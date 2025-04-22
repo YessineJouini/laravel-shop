@@ -15,15 +15,15 @@
             @endforeach
         </ul>
         <h4>Shipping Address:</h4>
-@if($shippingAddress)
-    <p>{{ $shippingAddress->line1 }}</p>
-    <p>{{ $shippingAddress->line2 }}</p>
-    <p>{{ $shippingAddress->city }}</p>
-    <p>{{ $shippingAddress->zip }}</p>
-    <p>{{ $shippingAddress->country }}</p>
-@else
-    <p>No shipping address provided.</p>
-@endif
+        @if($shippingAddress)
+            <p>{{ $shippingAddress->line1 }}</p>
+            <p>{{ $shippingAddress->line2 }}</p>
+            <p>{{ $shippingAddress->city }}</p>
+            <p>{{ $shippingAddress->zip }}</p>
+            <p>{{ $shippingAddress->country }}</p>
+        @else
+            <p>No shipping address provided.</p>
+        @endif
 
         <h4>Total: ${{ $order->total }}</h4>
     </div>
