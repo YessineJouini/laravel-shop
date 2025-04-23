@@ -56,82 +56,92 @@ class CartController extends Controller
 
         $cartItems = $cart->items()->with('product')->get();
         $total = $cartItems->sum(fn($item) => $item->quantity * $item->product->price);
-
-        return view('cart.checkout', compact('cartItems', 'total'));
+        $addresses = auth()->user()->addresses;
+        return view('cart.checkout', compact('cartItems', 'total' , 'addresses'));
     }
 
     // Finalize checkout: Create order, save address, and process payment
     public function checkout(Request $request)
-    {
-        $user = auth()->user(); // Get the authenticated user
-        $cart = $user->cart;
-    
-        // Validate the cart exists and is not empty
-        if (!$cart || $cart->items->isEmpty()) {
-            return redirect()->route('cart.view')->with('error', 'Your cart is empty.');
-        }
-    
-        // Validate the incoming address data (ensure they provide the required details)
-        $validated = $request->validate([
-            'line1' => 'required|string|max:255',
-            'line2' => 'nullable|string|max:255',
-            'city' => 'required|string|max:255',
-            'zip' => 'required|string|max:255',
-            'country' => 'required|string|max:255',
-        ]);
-    
-        $order = null;  // Initialize the $order variable outside the transaction
-    
-        // Start a transaction to ensure everything happens atomically
-        DB::transaction(function () use ($user, $cart, $validated, &$order, $request) {
-            // Create or update the shipping address
+{
+    $user = auth()->user();
+    $cart = $user->cart;
+
+    if (! $cart || $cart->items->isEmpty()) {
+        return redirect()->route('cart.view')
+                         ->with('error', 'Your cart is empty.');
+    }
+
+    // 1) Validate inputs: either saved_address_id OR new address fields must be present
+    $validated = $request->validate([
+        'saved_address_id' => 'nullable|exists:addresses,id',
+        'line1'            => 'required_without:saved_address_id|string|max:255',
+        'line2'            => 'nullable|string|max:255',
+        'city'             => 'required_without:saved_address_id|string|max:255',
+        'zip'              => 'required_without:saved_address_id|string|max:255',
+        'country'          => 'required_without:saved_address_id|string|max:255',
+        'payment_method'   => 'required|in:cash_on_delivery,card',
+        // If you want to validate card inputs too:
+        'card_number'      => 'required_if:payment_method,card|digits:16',
+        'card_expiry_date' => 'required_if:payment_method,card|date_format:m/y',
+        'card_cvc'         => 'required_if:payment_method,card|digits:3',
+    ]);
+
+    DB::transaction(function () use ($user, $cart, $validated, &$order) {
+        // 2) Determine which address to use
+        if (!empty($validated['saved_address_id'])) {
+            // Use existing address
+            $address = Address::findOrFail($validated['saved_address_id']);
+        } else {
+            // Create or update the shipping address for this user
             $address = Address::updateOrCreate(
+                ['user_id' => $user->id, 'type' => 'shipping'],
                 [
-                    'user_id' => $user->id,
-                    'type' => 'shipping',
-                ],
-                [
-                    'line1' => $validated['line1'],
-                    'line2' => $validated['line2'],
-                    'city' => $validated['city'],
-                    'zip' => $validated['zip'],
+                    'line1'   => $validated['line1'],
+                    'line2'   => $validated['line2'] ?? null,
+                    'city'    => $validated['city'],
+                    'zip'     => $validated['zip'],
                     'country' => $validated['country'],
                 ]
             );
-    
-            // Create the order
-            $order = Order::create([
-                'user_id' => $user->id,
-                'total' => $cart->items->sum(fn($item) => $item->quantity * $item->product->price),
-                'status' => 'pending',
-                'payment_method' => $request->payment_method,
-                'shipping_address_id' => $address->id,
+        }
+
+        // 3) Create the order
+        $order = Order::create([
+            'user_id'             => $user->id,
+            'total'               => $cart->items->sum(fn($i) => $i->quantity * $i->product->price),
+            'status'              => 'pending',
+            'payment_method'      => $validated['payment_method'],
+            'shipping_address_id' => $address->id,
+        ]);
+
+        // 4) (Optional) record in payments table
+        \App\Models\Payment::create([
+            'order_id'      => $order->id,
+            'method'        => $validated['payment_method'],
+            'status'        => $validated['payment_method'] === 'card' ? 'paid' : 'pending',
+            'transaction_id'=> null,
+            'amount'        => $order->total,
+        ]);
+
+        // 5) Copy cart items
+        foreach ($cart->items as $item) {
+            $order->orderItems()->create([
+                'product_id' => $item->product_id,
+                'quantity'   => $item->quantity,
+                'price'      => $item->product->price,
             ]);
-            \App\Models\Payment::create([
-                'order_id'      => $order->id,
-                'method'        => $request->payment_method,
-                'status'        => $request->payment_method === 'card' ? 'paid' : 'pending',
-                'transaction_id'=> null,      // or real gateway ID
-                'amount'        => $order->total,
-              ]);
-    
-            // Copy cart items to the order
-            foreach ($cart->items as $item) {
-                $order->orderItems()->create([
-                    'product_id' => $item->product_id,
-                    'quantity' => $item->quantity,
-                    'price' => $item->product->price,
-                ]);
-            }
-    
-            // Clear the cart items after the order is placed
-            $cart->items()->delete();
-        });
-    
-        // Redirect to the order confirmation page with the order ID
-        return redirect()->route('cart.confirmation', ['order' => $order->id])
-                         ->with('success', 'Your order has been placed!');
-    }
+        }
+
+        // 6) Clear cart
+        $cart->items()->delete();
+    });
+
+    // 7) Redirect to confirmation
+    return redirect()
+        ->route('cart.confirmation', ['order' => $order->id])
+        ->with('success', 'Your order has been placed!');
+}
+
     public function showConfirmation(Order $order)
 {
     $shippingAddress = $order->shippingAddress;
@@ -141,6 +151,38 @@ class CartController extends Controller
         'shippingAddress' => $shippingAddress,
     ]);
 }
+public function updateQuantity(Request $request, $itemId)
+    {
+        $request->validate([
+            'quantity' => 'required|integer|min:1'
+        ]);
+
+        $user = Auth::user();
+        $cart = $user->cart;
+        $item = $cart->items()->where('id', $itemId)->firstOrFail();
+
+        $item->update(['quantity' => $request->quantity]);
+
+        return redirect()->route('cart.view')
+                         ->with('success', 'Quantity updated!');
+    }
+
+    /**
+     * Remove a single item from the cart.
+     */
+    public function removeItem($itemId)
+    {
+        $user = Auth::user();
+        $cart = $user->cart;
+        $item = $cart->items()->where('id', $itemId)->firstOrFail();
+
+        $item->delete();
+
+        return redirect()->route('cart.view')
+                         ->with('success', 'Item removed from cart.');
+    }
+
+
     
 }
 

@@ -2,39 +2,65 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
+use App\Models\Order;
+use App\Models\Address;
 
 class DashboardController extends Controller
 {
     public function index()
-{
-    Log::info('Authenticated User Class: ' . get_class(Auth::user()));
-    $user = Auth::user();
+    {
+        $user = Auth::user();
 
-    // Debugging: Log the authenticated user's ID and role
-    Log::info('Authenticated User ID: ' . $user->id);
-    Log::info('Authenticated User Role: ' . $user->role);
+        // Fetch orders for this user (admins see all)
+        $orders = Order::with(['orderItems.product', 'shippingAddress'])
+            ->when($user->role === 'customer', fn($q) => $q->where('user_id', $user->id))
+            ->latest()
+            ->get();
 
-    $orders = collect();
+        // Fetch all shipping addresses for this user
+        $addresses = $user->addresses()
+            ->where('type', 'shipping')
+            ->latest()
+            ->get();
 
-    if ($user) {
-        if ($user->role === 'customer') {
-            // Fetch orders for customers
-            $orders = $user
-                ->orders()
-                ->with('orderItems.product')
-                ->latest()
-                ->get();
-        } elseif ($user->role === 'admin') {
-            // Fetch all orders for admins
-            $orders = \App\Models\Order::with('orderItems.product')
-                ->latest()
-                ->get();
-        }
+        return view('dashboard.index', compact('user','orders','addresses'));
     }
 
-    return view('dashboard.index', compact('user', 'orders'));
+    /**
+     * Update or create a shipping address
+     */
+    public function saveAddress(Request $request, Address $address = null)
+    {
+        $data = $request->validate([
+            'line1'   => 'required|string|max:255',
+            'line2'   => 'nullable|string|max:255',
+            'city'    => 'required|string|max:100',
+            'zip'     => 'required|string|max:50',
+            'country' => 'required|string|max:100',
+        ]);
+
+        // If an $address was injected, update it; otherwise create a new one
+        $address = Address::updateOrCreate(
+            ['id' => $address?->id],
+            array_merge($data, [
+                'user_id' => $request->user()->id,
+                'type'    => 'shipping',
+            ])
+        );
+
+        return back()->with('success', 'Shipping address saved.');
+    }
+
+    /**
+     * Delete a saved address
+     */
+    public function deleteAddress(Address $address)
+    {
+        $this->authorize('delete', $address);
+        $address->delete();
+
+        return back()->with('success', 'Address removed.');
+    }
 }
-    }
-

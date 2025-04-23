@@ -10,20 +10,20 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\OrderController;
 
-// Register alias for middleware (optional if already in kernel)
+// Register alias for middleware?
 Route::aliasMiddleware('checkrole', \App\Http\Middleware\CheckRole::class);
 
-// Root redirect
+// main display
 Route::get('/', function () {
     return Auth::check() ? redirect()->route('store.index') : redirect()->route('login');
 });
 
-// Admin dashboard (for admin routes)
+// Admin dashboard (
 Route::get('/admin', function () {
     return view('admin');
 })->middleware(['auth', 'checkrole:admin'])->name('admin.dashboard');
 
-// Admin-only routes
+// Admin routes
 Route::middleware(['auth', 'checkrole:admin'])->group(function () {
     Route::resource('categories', CategoryController::class);
     Route::resource('products', ProductController::class);
@@ -33,7 +33,7 @@ Route::middleware(['auth', 'checkrole:admin'])->group(function () {
     Route::post('/orders/{order}/decline', [OrderController::class, 'decline'])->name('orders.decline');
 });
 
-// Public store routes
+// Public routes
 Route::get('/store', [StoreController::class, 'index'])->name('store.index');
 Route::resource('store', StoreController::class)->only(['index', 'show']);
 
@@ -43,14 +43,20 @@ Auth::routes(['verify' => true]);
 // Authenticated user routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/dashboard/address/{address?}', [DashboardController::class, 'saveAddress'])
+     ->name('dashboard.address.save');
+Route::delete('/dashboard/address/{address}', [DashboardController::class, 'deleteAddress'])
+     ->name('dashboard.address.delete');
 
-    // Cart Routes
+    // Cart 
     Route::get('/cart', [CartController::class, 'view'])->name('cart.view');
     Route::post('/cart/{productId}/add', [CartController::class, 'addToCart'])->name('cart.add');
     Route::get('/cart/checkout', [CartController::class, 'showCheckoutForm'])->name('cart.checkout.form');
     Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
+    Route::post('/cart/item/{itemId}/update', [CartController::class, 'updateQuantity'])->name('cart.updateQuantity');
+    Route::delete('/cart/item/{itemId}', [CartController::class, 'removeItem'])->name('cart.removeItem');
 
 });
 
-// Order Confirmation (show after order is placed)
+// Order Confirmation 
 Route::get('/order/confirmation/{order}', [CartController::class, 'showConfirmation'])->name('cart.confirmation');
