@@ -107,6 +107,13 @@ class CartController extends Controller
                 'payment_method' => $request->payment_method,
                 'shipping_address_id' => $address->id,
             ]);
+            \App\Models\Payment::create([
+                'order_id'      => $order->id,
+                'method'        => $request->payment_method,
+                'status'        => $request->payment_method === 'card' ? 'paid' : 'pending',
+                'transaction_id'=> null,      // or real gateway ID
+                'amount'        => $order->total,
+              ]);
     
             // Copy cart items to the order
             foreach ($cart->items as $item) {

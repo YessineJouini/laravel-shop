@@ -14,7 +14,11 @@ public const STATUS_DECLINED            = 'declined';
     protected $table = 'orders';
 
     protected $fillable = [
-        'user_id', 'status','total'
+        'user_id',
+        'status',
+        'total',
+        'payment_method',
+        'shipping_address_id',
     ];
 
     
@@ -44,5 +48,9 @@ public const STATUS_DECLINED            = 'declined';
                 return $this->hasOne(Address::class, 'user_id', 'user_id') // Assuming the address is related to user_id
                            ->where('type', 'shipping');
             }
+            public function payment()
+{
+    return $this->hasOne(\App\Models\Payment::class);
+}
        
 }
