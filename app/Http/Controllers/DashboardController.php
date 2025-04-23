@@ -63,4 +63,16 @@ class DashboardController extends Controller
 
         return back()->with('success', 'Address removed.');
     }
+    public function showOrder(Order $order)
+    {
+        // Prevent users from viewing others' orders
+        if ($order->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Load items and shipping address
+        $order->load('orderItems.product', 'shippingAddress');
+
+        return view('dashboard.order_show', compact('order'));
+    }
 }

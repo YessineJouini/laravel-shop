@@ -15,7 +15,7 @@ class StoreController extends Controller
                 // Pick layout: admin → views/layout.blade.php, customer → views/store/layout.blade.php
                 $layout = (Auth::check() && Auth::user()->role === 'admin')
                     ? 'layout'
-                    : 'store.layout';
+                    : 'layouts.app';
 
                 return view('store.index', compact('products', 'layout'));
             }

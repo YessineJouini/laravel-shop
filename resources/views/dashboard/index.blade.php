@@ -49,9 +49,9 @@
                     </span>   
                     </td>
                     <td class="text-right">
-                      <a href="{{ route('orders.show', $order) }}" class="btn btn-sm btn-primary">
-                        <i class="fas fa-eye"></i> View
-                      </a>
+                    <a href="{{ route('dashboard.orders.show', $order) }}" class="btn btn-sm btn-primary">
+    <i class="fas fa-eye"></i> View
+</a>
                     </td>
                   </tr>
                 @endforeach

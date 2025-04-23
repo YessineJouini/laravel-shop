@@ -43,6 +43,10 @@ Auth::routes(['verify' => true]);
 // Authenticated user routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get(
+        '/dashboard/orders/{order}',
+        [DashboardController::class, 'showOrder']
+    )->name('dashboard.orders.show');
     Route::post('/dashboard/address/{address?}', [DashboardController::class, 'saveAddress'])
      ->name('dashboard.address.save');
 Route::delete('/dashboard/address/{address}', [DashboardController::class, 'deleteAddress'])
