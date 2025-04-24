@@ -2,26 +2,22 @@
 
 namespace Database\Factories;
 
+use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Product>
- */
 class ProductFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
+    protected $model = Product::class;
+
     public function definition(): array
     {
         return [
             'name' => $this->faker->words(2, true),
-            'description' => $this->faker->sentence,
-            'price' => $this->faker->randomFloat(2, 5, 200),
-            'image' => 'productImg/default.jpg',
-            'category_id' => rand(1, 5),
+            'description' => $this->faker->sentence(),
+            'price' => $this->faker->randomFloat(2, 10, 500),
+            'image' => 'productsimg/default.png',
+            'category_id' => Category::factory(), // Automatically create a category
         ];
     }
 }
