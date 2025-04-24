@@ -59,7 +59,7 @@
           <h5 class="mt-4">
             <i class="fas fa-dollar-sign mr-1"></i>
             Total Paid: 
-            <span class="badge badge-success">
+            <span class="text-success">
               ${{ number_format($order->total, 2) }}
             </span>
           </h5>

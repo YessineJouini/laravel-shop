@@ -3,6 +3,7 @@
 @section('title', 'Store')
 
 @section('content')
+@php use Illuminate\Support\Facades\Storage; @endphp
 <div class="content-wrapper">
   <section class="content-header">
     <div class="container-fluid">
@@ -84,10 +85,11 @@
           <div class="col-6 col-sm-4 col-md-3 mb-4">
             <div class="card card-hover h-100 shadow-sm">
               <div class="card-img-top overflow-hidden" style="height:180px;">
-                <img src="{{ asset('storage/'.$product->image) }}"
-                     alt="{{ $product->name }}"
-                     class="w-100 h-100"
-                     style="object-fit:cover;">
+                                <img
+                    src="{{ Storage::url($product->image) }}"
+                    alt="{{ $product->name }}"
+                    width="200"
+                  />
               </div>
               <div class="card-body d-flex flex-column">
                 <h6 class="card-title">{{ Str::limit($product->name, 30) }}</h6>

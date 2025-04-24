@@ -13,11 +13,12 @@ class ProductFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => $this->faker->words(2, true),
+            'name'        => $this->faker->words(2, true),
             'description' => $this->faker->sentence(),
-            'price' => $this->faker->randomFloat(2, 10, 500),
-            'image' => 'productsimg/default.png',
-            'category_id' => Category::factory(), // Automatically create a category
+            'price'       => $this->faker->randomFloat(2, 10, 500),
+            'stock'       => $this->faker->numberBetween(0, 100),   
+            'image'       => 'productImg/default.jpg',
+            'category_id' => Category::factory(),
         ];
     }
 }
