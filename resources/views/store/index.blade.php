@@ -88,7 +88,8 @@
                                 <img
                     src="{{ Storage::url($product->image) }}"
                     alt="{{ $product->name }}"
-                    width="200"
+                    object-fit: fill;
+                    width="100%"
                   />
               </div>
               <div class="card-body d-flex flex-column">

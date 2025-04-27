@@ -3,16 +3,17 @@
 namespace App\Models;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use App\Models\order;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     
-    
+    use Notifiable;
     use HasFactory, Notifiable; // ✅ Place HasFactory at the top
 
     public function isAdmin()

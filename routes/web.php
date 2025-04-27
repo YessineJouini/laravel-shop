@@ -9,6 +9,9 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\OrderController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
+
 
 // Register alias for middleware?
 Route::aliasMiddleware('checkrole', \App\Http\Middleware\CheckRole::class);
@@ -34,11 +37,12 @@ Route::middleware(['auth', 'checkrole:admin'])->group(function () {
 });
 
 // Public routes
-Route::get('/store', [StoreController::class, 'index'])->name('store.index');
+
 Route::resource('store', StoreController::class)->only(['index', 'show']);
 
 // Auth routes
 Auth::routes(['verify' => true]);
+
 
 // Authenticated user routes
 Route::middleware(['auth'])->group(function () {
@@ -61,6 +65,23 @@ Route::delete('/dashboard/address/{address}', [DashboardController::class, 'dele
     Route::delete('/cart/item/{itemId}', [CartController::class, 'removeItem'])->name('cart.removeItem');
 
 });
-
+Route::get('/email/verify', function () {
+    return view('auth.verify');
+})->name('verification.notice');
 // Order Confirmation 
 Route::get('/order/confirmation/{order}', [CartController::class, 'showConfirmation'])->name('cart.confirmation');
+Route::middleware(['auth'])->group(function () {
+   
+
+    Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+        $request->fulfill();
+
+        return redirect('/dashboard');
+    })->middleware(['signed'])->name('verification.verify');
+
+    Route::post('/email/verification-notification', function (Request $request) {
+        $request->user()->sendEmailVerificationNotification();
+
+        return back()->with('message', 'Verification link sent!');
+    })->name('verification.send');
+});
