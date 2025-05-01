@@ -8,7 +8,7 @@
 
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" rel="stylesheet">
-
+    <link href="{{ asset('assets/img/Logo.ico') }}" rel="icon">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}">
     <!-- Tempusdominus Bootstrap 4 -->
