@@ -12,7 +12,9 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('order_id')->constrained()->onDelete('cascade');
-            $table->foreignId('product_id')->constrained()->onDelete('cascade');
+
+            $table->unsignedBigInteger('product_id'); // ✅ Add missing column
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
 
             $table->unsignedInteger('quantity');
             $table->decimal('price', 10, 2);
@@ -26,4 +28,3 @@ return new class extends Migration
         Schema::dropIfExists('order_items');
     }
 };
-
