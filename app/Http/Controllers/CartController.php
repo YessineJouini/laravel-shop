@@ -10,6 +10,7 @@ use App\Models\Address;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Notifications\OrderPlaced;
 
 class CartController extends Controller
 {
@@ -98,7 +99,8 @@ class CartController extends Controller
         $validated = $request->validate($rules);
     
         // Wrap in transaction
-        DB::transaction(function () use ($user, $cart, $validated, &$order) {
+        DB::transaction(function () use ($user, $cart, $validated, &$order) 
+        {
     
             // 1) Pick or create address
             if (! empty($validated['saved_address_id'])) {
@@ -142,10 +144,12 @@ class CartController extends Controller
                     'price'     => $item->product->price,
                 ]);
             }
-    
+        
             // 5) Clear cart
             $cart->items()->delete();
         });
+        $order->load('orderItems.product', 'shippingAddress');
+        $user->notify(new OrderPlaced($order));
     
         // Redirect to confirmation
         return redirect()

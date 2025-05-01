@@ -11,7 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cart_items', function (Blueprint $table) {
+        Schema::create('carts', function (Blueprint $table) {
+            $table->id();  // This creates an auto-incrementing primary key (id)
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
         $table->timestamps();
         });
