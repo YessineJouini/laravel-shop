@@ -7,10 +7,12 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CartController;
-use App\Http\Controllers\ProfileController;
+
 use App\Http\Controllers\OrderController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
+
+use App\Http\Controllers\WishlistController;
 
 
 // Register alias for middleware?
@@ -47,14 +49,19 @@ Auth::routes(['verify' => true]);
 // Authenticated user routes
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get(
-        '/dashboard/orders/{order}',
-        [DashboardController::class, 'showOrder']
-    )->name('dashboard.orders.show');
+    Route::get('/dashboard/orders/{order}',[DashboardController::class, 'showOrder'])->name('dashboard.orders.show');
+    
     Route::post('/dashboard/address/{address?}', [DashboardController::class, 'saveAddress'])
      ->name('dashboard.address.save');
-Route::delete('/dashboard/address/{address}', [DashboardController::class, 'deleteAddress'])
+    Route::delete('/dashboard/address/{address}', [DashboardController::class, 'deleteAddress'])
      ->name('dashboard.address.delete');
+     
+     Route::get('/wishlist', [WishlistController::class,'index'])->name('wishlist.index');
+     Route::post('/wishlist/toggle/{product}', [WishlistController::class,'toggle'])
+          ->name('wishlist.toggle');
+        Route::post('/wishlist/add/{id}', [WishlistController::class, 'add'])->name('wishlist.add');
+        Route::post('/wishlist/remove/{productId}', [WishlistController::class, 'remove'])->name('wishlist.remove');
+
 
     // Cart 
     Route::get('/cart', [CartController::class, 'view'])->name('cart.view');

@@ -48,12 +48,20 @@
                 <a class="nav-link" data-widget="pushmenu" href="#"><i class="fas fa-bars fa-lg"></i></a>
             </li>
             <!-- Home -->
-            <li class="nav-item d-none d-sm-inline-block">
-                <a href="{{ route('admin.dashboard') }}" class="nav-link">Home</a>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ route('store.index') }}">Store</a>
             </li>
-            <!-- Contact -->
-            <li class="nav-item d-none d-sm-inline-block">
-                <a href="#" class="nav-link">Contact</a>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-danger" href="#">Sales</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Whishlist</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{{ route('cart.view') }}">My Cart</a>
             </li>
         </ul>
 

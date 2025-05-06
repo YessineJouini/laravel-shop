@@ -40,6 +40,12 @@ public function cartItems()
 {
     return $this->hasManyThrough(CartItem::class, Cart::class, 'user_id', 'cart_id', 'id', 'id');
 }
+public function wishlistItems()
+{
+    return $this->belongsToMany(Product::class, 'wishlist_items')
+                ->withTimestamps();
+}
+
 
 
 

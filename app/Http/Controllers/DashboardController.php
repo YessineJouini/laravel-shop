@@ -24,8 +24,11 @@ class DashboardController extends Controller
             ->where('type', 'shipping')
             ->latest()
             ->get();
-
-        return view('dashboard.index', compact('user','orders','addresses'));
+            $layout = (Auth::check() && Auth::user()->role === 'admin')
+            ? 'layout'
+            : 'layouts.app';
+           
+        return view('dashboard.index', compact('user','orders','addresses','layout'));
     }
 
     /**
@@ -74,5 +77,22 @@ class DashboardController extends Controller
         $order->load('orderItems.product', 'shippingAddress');
 
         return view('dashboard.order_show', compact('order'));
+    }
+    public function cancelOrder(Order $order)
+    {
+        // Prevent users from cancelling others' orders
+        if ($order->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        // Check if the order can be cancelled
+        if ($order->status !== 'pending') {
+            return back()->with('error', 'Only pending orders can be cancelled.');
+        }
+
+        // Cancel the order
+        $order->update(['status' => 'cancelled']);
+
+        return back()->with('success', 'Order cancelled successfully.');
     }
 }
