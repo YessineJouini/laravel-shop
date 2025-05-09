@@ -55,7 +55,7 @@
               <a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link text-danger" href="#">Sales</a>
+              <a class="nav-link text-danger" href="{{ route('sales.view') }}">Sales</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#">Whishlist</a>
@@ -159,6 +159,11 @@
                     <li class="nav-item">
                         <a href="{{ route('store.index') }}" class="nav-link {{ request()->routeIs('store.*') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-store"></i><p>Store</p>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{{ route('sales.index') }}" class="nav-link {{ request()->routeIs('sales.*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-percentage"></i><p>Sales Managment</p>
                         </a>
                     </li>
 

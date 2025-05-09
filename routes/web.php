@@ -7,7 +7,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CartController;
-
+use App\Http\Controllers\SalesController;
 use App\Http\Controllers\OrderController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -36,10 +36,14 @@ Route::middleware(['auth', 'checkrole:admin'])->group(function () {
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::post('/orders/{order}/accept', [OrderController::class, 'accept'])->name('orders.accept');
     Route::post('/orders/{order}/decline', [OrderController::class, 'decline'])->name('orders.decline');
+    Route::resource('sales', SalesController::class);
+
+
 });
 
 // Public routes
 
+Route::get('/salesview', [SalesController::class, 'viewSales'])->name('sales.view');
 Route::resource('store', StoreController::class)->only(['index', 'show']);
 
 // Auth routes

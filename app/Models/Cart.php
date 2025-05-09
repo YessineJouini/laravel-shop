@@ -14,7 +14,7 @@ class Cart extends Model
         return $this->belongsTo(User::class);
     }
 
-    // Rename this to cartItems(), so Cart::cartItems() works
+    
     public function cartItems()
     {
         return $this->hasMany(CartItem::class);

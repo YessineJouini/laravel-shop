@@ -25,5 +25,16 @@ class Product extends Model
     return $this->belongsToMany(User::class, 'wishlist_items')
                 ->withTimestamps();
 }
+public function sale()
+{
+    return $this->hasOne(\App\Models\Sale::class);
+}
+public function getDiscountedPriceAttribute()
+{
+    if ($this->sale && $this->sale->isActive()) {
+        return round($this->price * (1 - $this->sale->discount_percent / 100), 2);
+    }
+    return $this->price;
+}
 
 }

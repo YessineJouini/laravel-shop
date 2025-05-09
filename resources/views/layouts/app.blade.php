@@ -46,7 +46,7 @@
               <a class="nav-link " href="{{ route('wishlist.index') }}">Wishlist</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link text-danger" href="#">Sales</a>
+              <a class="nav-link text-danger" href="{{ route('sales.view') }}">Sales</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="{{ route('cart.view') }}">My Cart</a>
