@@ -79,21 +79,23 @@
     </div>
   </div>
 
-  <section class="content">
-    <div class="container-fluid">
-      <div class="row">
-        @forelse($products as $product)
-          <div class="col-6 col-sm-4 col-md-3 mb-4">
-            <div class="card card-hover h-100 shadow-sm position-relative">
-              <!-- Wishlist Button -->
-              <form action="{{ route('wishlist.add', $product->id) }}" method="POST"
-                    class="position-absolute" style="top: 10px; right: 10px; z-index: 2;">
-                @csrf
-                <button type="submit" class="btn btn-sm btn-light text-danger border-0">
-                  <i class="far fa-heart"></i>
-                </button>
-              </form>
+<section class="content">
+  <div class="container-fluid">
+    <div class="row">
+      @forelse($products as $product)
+        <div class="col-6 col-sm-4 col-md-3 mb-4">
+          <div class="card card-hover h-100 shadow-sm position-relative">
 
+            <!-- Wishlist Button -->
+            <form action="{{ route('wishlist.add', $product->id) }}" method="POST"
+                  class="position-absolute" style="top: 10px; right: 10px; z-index: 2;">
+              @csrf
+              <button type="submit" class="btn btn-sm btn-light text-danger border-0">
+                <i class="far fa-heart"></i>
+              </button>
+            </form>
+
+            <a href="{{ route('products.show', $product->id) }}" class="text-decoration-none text-dark stretched-link">
               <!-- Product Image -->
               <div class="card-img-top overflow-hidden" style="height:180px;">
                 <img src="{{ Storage::url($product->image) }}"
@@ -108,8 +110,24 @@
                   {{ Str::limit($product->description, 60) }}
                 </p>
 
+                <!-- Average Rating -->
+                @php
+                  $avg = round($product->reviews()->avg('rating') ?? 0, 1);
+                @endphp
+                <div class="mb-1">
+                  @for ($i = 1; $i <= 5; $i++)
+                    @if($i <= $avg)
+                      <i class="fas fa-star text-warning"></i>
+                    @elseif($i - $avg < 1)
+                      <i class="fas fa-star-half-alt text-warning"></i>
+                    @else
+                      <i class="far fa-star text-warning"></i>
+                    @endif
+                  @endfor
+                  <small class="text-muted">({{ number_format($avg, 1) }})</small>
+                </div>
+
                 <div class="mt-auto d-flex justify-content-between align-items-center">
-                  {{-- Discounted Price Logic --}}
                   @if($product->sale && $product->sale->isActive())
                     <div>
                       <span class="font-weight-bold text-danger">
@@ -124,34 +142,41 @@
                       ${{ number_format($product->price, 2) }}
                     </span>
                   @endif
-
-                  {{-- Add to Cart --}}
-                  <form action="{{ route('cart.add', $product->id) }}" method="POST">
-                    @csrf
-                    <button type="submit" class="btn btn-sm btn-success">
-                      <i class="fas fa-cart-plus"></i>
-                    </button>
-                  </form>
                 </div>
               </div>
-            </div>
-          </div>
-        @empty
-          <div class="col-12">
-            <div class="alert alert-warning text-center">
-              No products found.
-            </div>
-          </div>
-        @endforelse
-      </div>
+            </a>
 
-      @if(method_exists($products, 'links'))
-        <div class="d-flex justify-content-center">
-          {{ $products->appends(request()->input())->links() }}
+            <!-- Add to Cart Button -->
+            <div class="position-absolute" style="bottom: 10px; right: 10px;">
+              <form action="{{ route('cart.add', $product->id) }}" method="POST">
+                @csrf
+                <button type="submit" class="btn btn-sm btn-success">
+                  <i class="fas fa-cart-plus"></i>
+                </button>
+              </form>
+            </div>
+
+          </div>
         </div>
-      @endif
+      @empty
+        <div class="col-12">
+          <div class="alert alert-warning text-center">
+            No products found.
+          </div>
+        </div>
+      @endforelse
     </div>
-  </section>
+
+    @if(method_exists($products, 'links'))
+      <div class="d-flex justify-content-center">
+        {{ $products->appends(request()->input())->links() }}
+      </div>
+    @endif
+  </div>
+</section>
+
+
+
 </div>
 
 <!-- Floating Cart Button -->

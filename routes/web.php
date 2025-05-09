@@ -13,6 +13,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\ReviewController;
 
 
 // Register alias for middleware?
@@ -45,6 +46,8 @@ Route::middleware(['auth', 'checkrole:admin'])->group(function () {
 
 Route::get('/salesview', [SalesController::class, 'viewSales'])->name('sales.view');
 Route::resource('store', StoreController::class)->only(['index', 'show']);
+Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
+
 
 // Auth routes
 Auth::routes(['verify' => true]);
@@ -54,7 +57,7 @@ Auth::routes(['verify' => true]);
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/orders/{order}',[DashboardController::class, 'showOrder'])->name('dashboard.orders.show');
-    
+     Route::resource('reviews', ReviewController::class)->only(['store', 'update', 'destroy']);
     Route::post('/dashboard/address/{address?}', [DashboardController::class, 'saveAddress'])
      ->name('dashboard.address.save');
     Route::delete('/dashboard/address/{address}', [DashboardController::class, 'deleteAddress'])
