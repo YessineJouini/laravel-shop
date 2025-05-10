@@ -1,4 +1,3 @@
-
 @extends($layout)
 
 @section('title', 'Store')
@@ -9,7 +8,7 @@
   <section class="content-header">
     <div class="container-fluid">
       <h1 class="mb-3">Product Catalog</h1>
-    </div> 
+    </div>
   </section>
 
 <!-- Filter Bar -->
@@ -226,7 +225,7 @@
       $count = Auth::user()->cart?->items->sum('quantity') ?? 0;
     @endphp
     @if($count)
-      
+
       <span class="badge badge-pill position-absolute"
             style="top:-6px; right:-6px; font-size:0.75rem; background-color:red; color:white;">
         {{ $count }}

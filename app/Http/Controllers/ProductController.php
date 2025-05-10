@@ -11,11 +11,32 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        $products = Product::all();
-        return view('products.index', compact('products'));
+    public function index(Request $request)
+{
+    // Initialize query
+    $query = Product::query();
+
+    // Handle Search
+    if ($request->has('search') && !empty($request->search)) {
+        $search = $request->search;
+        $query->where('name', 'like', '%' . $search . '%');
     }
+
+    // Handle Sorting
+    $sortBy = $request->get('sort_by', 'name'); // Default sort by 'name'
+    $sortDirection = $request->get('sort_direction', 'asc'); // Default to ascending order
+
+    // Apply sorting to the query before fetching products
+    $query->orderBy($sortBy, $sortDirection);
+
+    // Fetch products with applied search and sorting
+    $products = $query->get();
+
+    // Return the view with products, sorting parameters
+    return view('products.index', compact('products', 'sortBy', 'sortDirection'));
+}
+
+
 
     /**
      * Show the form for creating a new resource.

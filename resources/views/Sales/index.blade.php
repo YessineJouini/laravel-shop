@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layout')
 @section('header','Manage Sales')
 @section('content')
   <a href="{{ route('sales.create') }}" class="btn btn-primary mb-3">New Sale</a>

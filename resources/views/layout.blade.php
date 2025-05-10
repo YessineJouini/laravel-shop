@@ -29,7 +29,7 @@
     <link rel="stylesheet" href="{{ asset('assets/css/mainstyle.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/css/frontend.css') }}">
 
-    @stack('styles')
+
 </head>
 
 <body class="hold-transition sidebar-mini layout-fixed layout-navbar-fixed">
@@ -152,47 +152,53 @@
                 </div>
             </div>
 
-            <!-- Sidebar Menu -->
-            <nav class="mt-2">
-                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+         <!-- Sidebar Menu -->
+<nav class="mt-2">
+  <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
 
-                    <li class="nav-item">
-                        <a href="{{ route('store.index') }}" class="nav-link {{ request()->routeIs('store.*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-store"></i><p>Store</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ route('sales.index') }}" class="nav-link {{ request()->routeIs('sales.*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-percentage"></i><p>Sales Managment</p>
-                        </a>
-                    </li>
+    <!-- Dashboard -->
+    <li class="nav-item">
+      <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+        <i class="nav-icon fas fa-tachometer-alt"></i>
+        <p>Dashboard</p>
+      </a>
+    </li>
 
-                    <li class="nav-item">
-                        <a href="{{ route('orders.index') }}" class="nav-link {{ request()->routeIs('orders.*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-file-invoice-dollar"></i><p>Order Management</p>
-                        </a>
-                    </li>
+    <!-- Analytics -->
+    <li class="nav-item">
+      <a href="{{ route('admin.analytics') }}" class="nav-link {{ request()->routeIs('admin.analytics') ? 'active' : '' }}">
+        <i class="nav-icon fas fa-chart-line"></i>
+        <p>Analytics</p>
+      </a>
+    </li>
 
-                    <li class="nav-item has-treeview {{ request()->routeIs('categories.*','products.*') ? 'menu-open' : '' }}">
-                        <a href="#" class="nav-link {{ request()->routeIs('categories.*','products.*') ? 'active' : '' }}">
-                            <i class="nav-icon fas fa-cog"></i><p>Admin Management<i class="right fas fa-angle-left"></i></p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            <li class="nav-item">
-                                <a href="{{ route('categories.index') }}" class="nav-link {{ request()->routeIs('categories.*') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i><p>All Categories</p>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('products.index') }}" class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}">
-                                    <i class="far fa-circle nav-icon"></i><p>All Products</p>
-                                </a>
-                            </li>
-                        </ul>
-                    </li>
+    <!-- Orders -->
+    <li class="nav-item">
+      <a href="{{ route('orders.index') }}" class="nav-link {{ request()->routeIs('orders.index') ? 'active' : '' }}">
+        <i class="nav-icon fas fa-box"></i>
+        <p>Orders</p>
+      </a>
+    </li>
+    <li class="nav-item">
+  <a href="{{ route('categories.index') }}" class="nav-link {{ request()->routeIs('categories.index') ? 'active' : '' }}">
+    <i class="nav-icon fas fa-tags"></i>
+    <p>Categories</p>
+  </a>
+</li>
 
-                </ul>
-            </nav>
+
+    <!-- Products -->
+    <li class="nav-item">
+      <a href="{{ route('products.index') }}" class="nav-link {{ request()->routeIs('products.index') ? 'active' : '' }}">
+        <i class="nav-icon fas fa-tags"></i>
+        <p>Products</p>
+      </a>
+    </li>
+
+  </ul>
+</nav>
+<!-- /.sidebar-menu -->
+
         </div>
     </aside>
     <!-- /.sidebar -->
@@ -246,6 +252,7 @@
 </script>
 <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 <script src="{{ asset('vendor/overlayScrollbars/js/jquery.overlayScrollbars.min.js') }}"></script>
+<script src="{{ asset('vendor/plugins/chart.js/chart.min.js') }}"></script>
 <script src="{{ asset('vendor/adminlte/dist/js/adminlte.min.js') }}"></script>
 
 <!-- OPTIONAL PLUGINS -->
@@ -256,10 +263,13 @@
 <script src="{{ asset('vendor/plugins/jqvmap/jquery.vmap.min.js') }}"></script>
 <script src="{{ asset('vendor/plugins/jqvmap/maps/jquery.vmap.usa.js') }}"></script>
 <script src="{{ asset('vendor/adminlte/dist/js/demo.js') }}"></script>
+
 @if(Route::is('admin.dashboard'))
     <script src="{{ asset('vendor/adminlte/dist/js/pages/dashboard.js') }}"></script>
 @endif
 
-@stack('scripts')
+@yield('js')
+
+
 </body>
 </html>

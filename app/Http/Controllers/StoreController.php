@@ -12,24 +12,24 @@ class StoreController extends Controller
     public function index(Request $request)
     {
         $query = Product::with('category');
-    
-        // search 
+
+        // search
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
         }
-    
-        // category 
+
+        // category
         if ($request->filled('category')) {
             $query->where('category_id', $request->category);
         }
         if ($request->filled('min_price')) {
             $query->where('price', '>=', $request->min_price);
         }
-    
+
         if ($request->filled('max_price')) {
             $query->where('price', '<=', $request->max_price);
         }
-    
+
         // Sorting
         if ($request->filled('sort')) {
             switch ($request->sort) {
@@ -47,20 +47,17 @@ class StoreController extends Controller
                     break;
                 }
             }
-    
+
         // Paginate
         $products = $query->latest()->paginate(12);
-    
+
         // Load all categories
         $categories = Category::all();
-    
-        // Pick layout
-        $layout = (Auth::check() && Auth::user()->role === 'admin')
-            ? 'layout'
-            : 'layouts.app';
-            return view('store.index', compact('products', 'categories', 'layout'));
-        }
-    }
-    
 
-    
+        // Pick layout
+        $isAdminStore = (Auth::check() && Auth::user()->role === 'admin');
+        $layout = $isAdminStore ? 'layout' : 'layouts.app';
+
+        return view('store.index', compact('products', 'categories', 'layout', 'isAdminStore'));
+    }
+}

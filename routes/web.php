@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\AnalyticsController;
 
 
 // Register alias for middleware?
@@ -38,6 +39,8 @@ Route::middleware(['auth', 'checkrole:admin'])->group(function () {
     Route::post('/orders/{order}/accept', [OrderController::class, 'accept'])->name('orders.accept');
     Route::post('/orders/{order}/decline', [OrderController::class, 'decline'])->name('orders.decline');
     Route::resource('sales', SalesController::class);
+     Route::get('/admin/analytics', [AnalyticsController::class, 'index'])
+     ->name('admin.analytics');
 
 
 });
