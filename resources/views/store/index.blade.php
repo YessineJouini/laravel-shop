@@ -12,32 +12,51 @@
     </div> 
   </section>
 
-  <!-- Filter Bar -->
-  <div class="card card-outline card-primary mb-4">
-    <div class="card-header bg-primary">
-      <h3 class="card-title text-white">
-        <i class="fas fa-filter mr-2"></i>Filter Products
-      </h3>
+<!-- Filter Bar -->
+<div class="card mb-4" style="border-color: #00c2ed;">
+  <div class="card-header" style="background-color: #00c2ed; padding: .5rem 1rem;">
+    <div class="d-flex align-items-center justify-content-between">
+      <!-- Search -->
+      <div class="input-group input-group-sm w-75">
+        <span class="input-group-text bg-white border-0">
+          <i class="fas fa-search" style="color: #00c2ed;"></i>
+        </span>
+        <input
+          type="text"
+          name="search"
+          class="form-control form-control-sm border-0"
+          placeholder="Search..."
+          value="{{ request('search') }}"
+        >
+      </div>
+
+      <!-- Toggle Filters -->
+      <button
+        class="btn btn-sm btn-light"
+        type="button"
+        data-bs-toggle="collapse"
+        data-bs-target="#filterOptions"
+        aria-expanded="false"
+        aria-controls="filterOptions"
+      >
+        <i class="fas fa-sliders-h" style="color: #00c2ed;"></i> Filters
+      </button>
     </div>
+  </div>
+
+  <div class="collapse" id="filterOptions">
     <div class="card-body p-2">
       <form method="GET" action="{{ route('store.index') }}">
-        <div class="d-flex flex-wrap align-items-center justify-content-start">
-
-          <!-- Search -->
-          <div class="me-2 mb-2">
-            <div class="input-group input-group-sm">
-              <span class="input-group-text"><i class="fas fa-search"></i></span>
-              <input type="text" name="search" class="form-control"
-                     placeholder="Search..." value="{{ request('search') }}">
-            </div>
-          </div>
-
+        <div class="d-flex flex-wrap align-items-center">
           <!-- Category -->
-          <div class="me-2 mb-2">
+          <div class="me-2 mb-2 flex-fill" style="min-width: 120px;">
             <select name="category" class="form-control form-control-sm">
               <option value="">All Categories</option>
               @foreach($categories as $cat)
-                <option value="{{ $cat->id }}" {{ request('category') == $cat->id ? 'selected' : '' }}>
+                <option
+                  value="{{ $cat->id }}"
+                  {{ request('category') == $cat->id ? 'selected' : '' }}
+                >
                   {{ $cat->name }}
                 </option>
               @endforeach
@@ -45,39 +64,55 @@
           </div>
 
           <!-- Min Price -->
-          <div class="me-2 mb-2">
-            <input type="number" name="min_price" class="form-control form-control-sm"
-                   placeholder="Min $" min="0" step="0.01" value="{{ request('min_price') }}">
+          <div class="me-2 mb-2" style="width: 100px;">
+            <input
+              type="number"
+              name="min_price"
+              class="form-control form-control-sm"
+              placeholder="Min $"
+              min="0"
+              step="0.01"
+              value="{{ request('min_price') }}"
+            >
           </div>
 
           <!-- Max Price -->
-          <div class="me-2 mb-2">
-            <input type="number" name="max_price" class="form-control form-control-sm"
-                   placeholder="Max $" min="0" step="0.01" value="{{ request('max_price') }}">
+          <div class="me-2 mb-2" style="width: 100px;">
+            <input
+              type="number"
+              name="max_price"
+              class="form-control form-control-sm"
+              placeholder="Max $"
+              min="0"
+              step="0.01"
+              value="{{ request('max_price') }}"
+            >
           </div>
 
           <!-- Sort -->
-          <div class="me-2 mb-2">
+          <div class="me-2 mb-2 flex-fill" style="min-width: 140px;">
             <select name="sort" class="form-control form-control-sm">
               <option value="">Sort By</option>
-              <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Newest</option>
-              <option value="oldest" {{ request('sort') == 'oldest' ? 'selected' : '' }}>Oldest</option>
-              <option value="price_low" {{ request('sort') == 'price_low' ? 'selected' : '' }}>Price ↑</option>
-              <option value="price_high" {{ request('sort') == 'price_high' ? 'selected' : '' }}>Price ↓</option>
+              <option value="newest"     {{ request('sort')=='newest'? 'selected':'' }}>Newest</option>
+              <option value="oldest"     {{ request('sort')=='oldest'? 'selected':'' }}>Oldest</option>
+              <option value="price_low"  {{ request('sort')=='price_low'? 'selected':'' }}>Price ↑</option>
+              <option value="price_high" {{ request('sort')=='price_high'? 'selected':'' }}>Price ↓</option>
             </select>
           </div>
 
-          <!-- Submit -->
+          <!-- Apply Button -->
           <div class="mb-2">
-            <button type="submit" class="btn btn-sm btn-primary">
-              <i class="fas fa-filter"></i>
+            <button type="submit" class="btn btn-sm" style="background-color: #00c2ed; color: #fff;">
+              Apply
             </button>
           </div>
-
         </div>
       </form>
     </div>
   </div>
+</div>
+
+
 
 <section class="content">
   <div class="container-fluid">
@@ -191,7 +226,7 @@
       $count = Auth::user()->cart?->items->sum('quantity') ?? 0;
     @endphp
     @if($count)
-      {{-- Red badge with white text and solid background --}}
+      
       <span class="badge badge-pill position-absolute"
             style="top:-6px; right:-6px; font-size:0.75rem; background-color:red; color:white;">
         {{ $count }}

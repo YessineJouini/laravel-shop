@@ -5,9 +5,16 @@
     <div class="row">
         <!-- Product Details -->
         <div class="col-lg-6 mb-4">
-            <div class="border p-3 shadow-sm rounded-lg">
-                <img src="{{ Storage::url($product->image) }}" class="img-fluid rounded" alt="{{ $product->name }}">
-            </div>
+          <div class="border p-3 shadow-sm rounded-lg" style="max-width:600px;">
+                    <div class="ratio ratio-4x3">
+                        <img 
+                        src="{{ Storage::url($product->image) }}" 
+                        class="rounded" 
+                        alt="{{ $product->name }}" 
+                        style="object-fit: cover; width: 100%; height: 100%;">
+                    </div>
+</div>
+
         </div>
         <div class="col-lg-6 mb-4">
             <div class="product-details">

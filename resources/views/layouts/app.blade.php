@@ -23,8 +23,7 @@
     <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm fixed-top">
       <div class="container-fluid px-4">
         <a class="navbar-brand" href="{{ url('/') }}" style="font-size: 1.4rem;">
-          <span style="color: #00c2ed; font-weight: 800">H</span>
-          <span style="color: #000; font-weight:200;">yperByte</span>
+          <span style="color: #00c2ed; font-weight: 800">H</span><span style="color: #000; font-weight:200;">yperByte</span>
         </a>
         <button class="navbar-toggler" type="button"
                 data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
@@ -66,7 +65,10 @@
             @guest
               @if (Route::has('login'))
                 <li class="nav-item">
-                  <a class="nav-link" href="{{ route('login') }}">{{ __('Login') }}</a>
+                  <a class="nav-link" href="{{ route('login') }}" style="color: #00c2ed;">
+                                  {{ __('Login') }}
+                </a>
+
                 </li>
               @endif
               @if (Route::has('register'))
