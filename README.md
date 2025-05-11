@@ -21,9 +21,12 @@ This is a Laravel-based e-commerce web application built as part of a final year
 
 Follow the steps below to set up this project on your local machine.
 
-### 1. Clone the repository
+
 
 ```bash
+### 1. Clone the repository
+
+
 git clone https://github.com/YOUR_USERNAME/laravel-shop.git
 cd laravel-
 
@@ -75,9 +78,9 @@ php artisan serve
  ### ROADMAP
 
 | Feature                     | Status              |
-| --------------------------- | ------------------- |
+| --------------------------- | -------------------  |
 | Multi-vendor support        | ❌ Planned           |
-| Payment integration   | ❌ Planned           |
+| Payment integration         | ❌ Planned           |
 | Inventory alerts            | ✅ Basic stock shown |      
 | API versioning (for mobile) | ❌ Future work       |
 
