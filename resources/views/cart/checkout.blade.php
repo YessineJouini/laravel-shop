@@ -15,11 +15,22 @@
                         @foreach ($cartItems as $item)
                             <li class="list-group-item d-flex justify-content-between align-items-center">
                                 {{ $item->product->name }} x {{ $item->quantity }}
-                                <span>${{ $item->quantity * $item->product->price }}</span>
+                                <span>
+                                    @if($item->product->sale && $item->product->sale->isActive())
+                                        ${{ number_format($item->quantity * $item->product->discounted_price, 2) }}
+                                    @else
+                                        ${{ number_format($item->quantity * $item->product->price, 2) }}
+                                    @endif
+                                </span>
                             </li>
                         @endforeach
                     </ul>
-                    <h4 class="mt-3 text-right">Total: <strong>${{ $total }}</strong></h4>
+                    <h4 class="mt-3 text-right">
+                        Total: 
+                        <strong>
+                            ${{ number_format($cartItems->sum(fn($i) => $i->quantity * ($i->product->sale && $i->product->sale->isActive() ? $i->product->discounted_price : $i->product->price)), 2) }}
+                        </strong>
+                    </h4>
                 </div>
             </div>
         </div>

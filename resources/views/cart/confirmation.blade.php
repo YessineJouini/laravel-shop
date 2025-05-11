@@ -35,7 +35,11 @@
                 <td>{{ $item->product->name }}</td>
                 <td class="text-center">{{ $item->quantity }}</td>
                 <td class="text-right">
-                  ${{ number_format($item->quantity * $item->price, 2) }}
+                  @if($item->product->sale && $item->product->sale->isActive())
+                    ${{ number_format($item->quantity * $item->product->discounted_price, 2) }}
+                  @else
+                    ${{ number_format($item->quantity * $item->product->price, 2) }}
+                  @endif
                 </td>
               </tr>
               @endforeach
@@ -60,7 +64,7 @@
             <i class="fas fa-dollar-sign mr-1"></i>
             Total Paid: 
             <span class="text-success">
-              ${{ number_format($order->total, 2) }}
+              ${{ number_format($order->orderItems->sum(fn($item) => $item->quantity * ($item->product->sale && $item->product->sale->isActive() ? $item->product->discounted_price : $item->product->price)), 2) }}
             </span>
           </h5>
         </div>

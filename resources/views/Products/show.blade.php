@@ -21,9 +21,21 @@
                 <h1 class="display-5 fw-bold mb-3">{{ $product->name }}</h1>
                 <p class="lead mb-4">{{ $product->description }}</p>
                 
-                <div class="d-flex align-items-center mb-4">
-                    <h3 class="text-success me-3">${{ number_format($product->price, 2) }}</h3>
-                    <span class="badge bg-primary fs-6">In Stock</span>
+                <div class="mt-auto d-flex justify-content-between align-items-center">
+                  @if($product->sale && $product->sale->isActive())
+                    <div>
+                      <span class="font-weight-bold text-danger">
+                        ${{ number_format($product->discounted_price, 2) }}
+                      </span>
+                      <small class="text-muted"><s>
+                        ${{ number_format($product->price, 2) }}
+                      </s></small>
+                    </div>
+                  @else
+                    <span class="font-weight-bold text-primary">
+                      ${{ number_format($product->price, 2) }}
+                    </span>
+                  @endif
                 </div>
 
                 <div class="rating mb-4">

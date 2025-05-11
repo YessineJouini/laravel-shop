@@ -66,8 +66,21 @@
                             <button type="submit" class="btn btn-sm btn-primary ml-2">Update</button>
                           </form>
                         </td>
-                        <td class="align-middle text-right">${{ number_format($item->product->price, 2) }}</td>
-                        <td class="align-middle text-right">${{ number_format($item->quantity * $item->product->price, 2) }}</td>
+                        <td class="align-middle text-right">
+                          @if($item->product->sale && $item->product->sale->isActive())
+                            <span class="text-danger">${{ number_format($item->product->discounted_price, 2) }}</span>
+                            <small class="text-muted"><s>${{ number_format($item->product->price, 2) }}</s></small>
+                          @else
+                            ${{ number_format($item->product->price, 2) }}
+                          @endif
+                        </td>
+                        <td class="align-middle text-right">
+                          @if($item->product->sale && $item->product->sale->isActive())
+                            ${{ number_format($item->quantity * $item->product->discounted_price, 2) }}
+                          @else
+                            ${{ number_format($item->quantity * $item->product->price, 2) }}
+                          @endif
+                        </td>
                         <td class="align-middle text-center">
                           <form action="{{ route('cart.removeItem', $item->id) }}" method="POST">
                             @csrf
@@ -91,7 +104,7 @@
                   <div class="col-sm-6">
                     <h5 class="mb-0">Total:
                       <span class="float-right">
-                        ${{ number_format($cartItems->sum(fn($i) => $i->quantity * $i->product->price), 2) }}
+                        ${{ number_format($cartItems->sum(fn($i) => $i->quantity * ($i->product->sale && $i->product->sale->isActive() ? $i->product->discounted_price : $i->product->price)), 2) }}
                       </span>
                     </h5>
                   </div>
