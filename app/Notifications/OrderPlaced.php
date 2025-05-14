@@ -34,15 +34,21 @@ class OrderPlaced extends Notification
     
         // List each item
         foreach ($this->order->orderItems as $item) {
+            $price = $item->product->sale && $item->product->sale->isActive() 
+                ? $item->product->discounted_price 
+                : $item->product->price;
+
             $mail->line(
                 "{$item->quantity} × {$item->product->name} — $" .
-                number_format($item->price * $item->quantity, 2)
+                number_format($price * $item->quantity, 2)
             );
         }
     
         // Calculate total based on order items directly
         $calculatedTotal = $this->order->orderItems->sum(function ($item) {
-            return $item->price * $item->quantity;
+            return $item->quantity * ($item->product->sale && $item->product->sale->isActive() 
+                ? $item->product->discounted_price 
+                : $item->product->price);
         });
     
         // Shipping address

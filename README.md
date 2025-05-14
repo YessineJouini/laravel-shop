@@ -28,7 +28,7 @@ Follow the steps below to set up this project on your local machine.
 
 
 git clone https://github.com/YOUR_USERNAME/laravel-shop.git
-cd laravel-
+cd laravel-shop
 
 ### 2. Install PHP Dependencies
 
@@ -40,7 +40,8 @@ npm install
 
 ### 4. Set Up Environment File
 
-cp .env.example .env
+MacOs: cp .env.example .env
+Windows: copy .env.example .env
 
 ### Update the following in your .env:
 

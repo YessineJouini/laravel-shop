@@ -121,7 +121,9 @@ class CartController extends Controller
             // 2) Create order
             $order = Order::create([
                 'user_id'             => $user->id,
-                'total'               => $cart->items->sum(fn($i)=> $i->quantity*$i->product->price),
+                'total'               => $cart->items->sum(fn($i)=> $i->quantity*($i->product->sale && $i->product->sale->isActive() 
+                ? $i->product->discounted_price 
+                : $i->product->price)),
                 'status'              => 'pending',
                 'payment_method'      => $validated['payment_method'],
                 'shipping_address_id' => $address->id,
@@ -141,7 +143,9 @@ class CartController extends Controller
                 $order->orderItems()->create([
                     'product_id'=> $item->product_id,
                     'quantity'  => $item->quantity,
-                    'price'     => $item->product->price,
+                    'price'     => $item->product->sale && $item->product->sale->isActive() 
+                    ? $item->product->discounted_price 
+                    : $item->product->price,
                 ]);
             }
         
