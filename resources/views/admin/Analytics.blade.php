@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Chart 2: Sales
   new Chart(document.getElementById('salesChart'), {
-    type: 'bar',
+    type: 'line',
     data: {
       labels: salesLabels,
       datasets: [{

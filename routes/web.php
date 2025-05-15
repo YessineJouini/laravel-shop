@@ -50,8 +50,10 @@ Route::middleware(['auth', 'checkrole:admin'])->group(function () {
 Route::get('/salesview', [SalesController::class, 'viewSales'])->name('sales.view');
 Route::resource('store', StoreController::class)->only(['index', 'show']);
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
-
-
+ Route::post('/cart/{productId}/add', [CartController::class, 'addToCart'])->name('cart.add');
+   Route::post('/cart/item/{itemId}/update', [CartController::class, 'updateQuantity'])->name('cart.updateQuantity');
+    Route::delete('/cart/item/{itemId}', [CartController::class, 'removeItem'])->name('cart.removeItem');
+ Route::get('/cart', [CartController::class, 'view'])->name('cart.view');
 // Auth routes
 Auth::routes(['verify' => true]);
 
@@ -71,17 +73,14 @@ Route::middleware(['auth'])->group(function () {
           ->name('wishlist.toggle');
         Route::post('/wishlist/add/{id}', [WishlistController::class, 'add'])->name('wishlist.add');
         Route::post('/wishlist/remove/{productId}', [WishlistController::class, 'remove'])->name('wishlist.remove');
-
+});
 
     // Cart 
-    Route::get('/cart', [CartController::class, 'view'])->name('cart.view');
-    Route::post('/cart/{productId}/add', [CartController::class, 'addToCart'])->name('cart.add');
+   
+    
     Route::get('/cart/checkout', [CartController::class, 'showCheckoutForm'])->name('cart.checkout.form');
     Route::post('/cart/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
-    Route::post('/cart/item/{itemId}/update', [CartController::class, 'updateQuantity'])->name('cart.updateQuantity');
-    Route::delete('/cart/item/{itemId}', [CartController::class, 'removeItem'])->name('cart.removeItem');
-
-});
+    
 Route::get('/email/verify', function () {
     return view('auth.verify');
 })->name('verification.notice');

@@ -12,6 +12,10 @@ public const STATUS_SHIPPING_IN_PROGRESS = 'shipping_in_progress';
 public const STATUS_DECLINED            = 'declined';
 
     protected $table = 'orders';
+    protected $casts = [
+        'total' => 'decimal:2',
+    ];
+
 
     protected $fillable = [
         'user_id',
@@ -21,7 +25,7 @@ public const STATUS_DECLINED            = 'declined';
         'shipping_address_id',
     ];
 
-    
+
     public function items()
             {
                 return $this->hasMany(OrderItem::class);
@@ -31,13 +35,13 @@ public const STATUS_DECLINED            = 'declined';
                 return $this->hasMany(OrderItem::class);
             }
 
-   
+
     public function user()
             {
                 return $this->belongsTo(User::class, 'user_id');
             }
 
-    
+
     public function getTotalAttribute()
             {
                 return $this->items
@@ -52,5 +56,5 @@ public const STATUS_DECLINED            = 'declined';
 {
     return $this->hasOne(\App\Models\Payment::class);
 }
-       
+
 }

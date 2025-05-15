@@ -180,6 +180,13 @@
       </a>
     </li>
     <li class="nav-item">
+      <a href="{{ route('sales.index') }}" class="nav-link {{ request()->routeIs('sales.index') ? 'active' : '' }}">
+        <i class="nav-icon fas fa-percent"></i>
+        <p>Sales</p>
+      </a>
+    </li>
+    
+    <li class="nav-item">
   <a href="{{ route('categories.index') }}" class="nav-link {{ request()->routeIs('categories.index') ? 'active' : '' }}">
     <i class="nav-icon fas fa-tags"></i>
     <p>Categories</p>

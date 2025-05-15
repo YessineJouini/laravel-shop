@@ -21,22 +21,28 @@ class AnalyticsController extends Controller
 
             DB::raw("count(*) as count")
             )
-            ->where('created_at', '>=', now()->subDays(6)->startOfDay())
+            ->where('created_at', '>=', now()->subDays(6)->startOfDay()->setTimezone('UTC'))
             ->groupBy('date')
             ->orderBy('date')
             ->get()
             ->pluck('count','date');
 
         // 2) Sales: daily sum for last 7 days
-        $salesLast7 = Order::select(
-                DB::raw("DATE(created_at) as date"),
-                DB::raw("SUM(total) as total")
-            )
-            ->where('created_at','>=', now()->subDays(6)->startOfDay())
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get()
-            ->pluck('total','date');
+
+$salesLast7 = DB::table('orders')
+    ->select(
+        DB::raw("DATE(created_at) as date"),
+        DB::raw("CAST(SUM(total) AS DECIMAL(10,2)) as daily_total")
+    )
+    ->where('created_at', '>=', now()->subDays(6)->startOfDay()->setTimezone('UTC'))
+    ->where('status', 'shipping_in_progress')  
+    ->groupBy(DB::raw("DATE(created_at)"))
+    ->orderBy('date')
+    ->get()
+    ->mapWithKeys(function ($row) {
+        return [$row->date => (float) $row->daily_total];
+    });  // Remove the ->toArray()
+
 
         // 3) Shipping Rate: shipped vs pending (last 30 days)
         $shipping = Order::select('status', DB::raw("count(*) as count"))
@@ -57,7 +63,7 @@ class AnalyticsController extends Controller
                 return [$name => $row->units];
             });
 
-        return view('admin.analytics', [
+        return view('admin.Analytics', [
             'usersLast7'  => $usersLast7,
             'salesLast7'  => $salesLast7,
             'shipping'    => $shipping,
