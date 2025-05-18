@@ -28,14 +28,27 @@ class AnalyticsController extends Controller
             ->pluck('count','date');
 
         // 2) Sales: daily sum for last 7 days
+ // 2) Total Users
+    $totalUsers = User::count();
 
+    // 3) Total Revenue (only from completed/shipping orders)
+    $totalRevenue = Order::whereIn('status', ['completed', 'shipping_in_progress'])
+        ->sum('total');
+
+    // 4) Average Order Value
+    $avgOrder = Order::whereIn('status', ['completed', 'shipping_in_progress'])
+        ->avg('total');
+
+    // 5) Conversion Rate (simple placeholder logic, e.g. orders / users)
+    $totalOrders = Order::count();
+    $conversionRate = $totalUsers > 0 ? round(($totalOrders / $totalUsers) * 100, 2) : 0;
 $salesLast7 = DB::table('orders')
     ->select(
         DB::raw("DATE(created_at) as date"),
         DB::raw("CAST(SUM(total) AS DECIMAL(10,2)) as daily_total")
     )
     ->where('created_at', '>=', now()->subDays(6)->startOfDay()->setTimezone('UTC'))
-    ->where('status', 'shipping_in_progress')  
+    ->where('status', 'shipping_in_progress')
     ->groupBy(DB::raw("DATE(created_at)"))
     ->orderBy('date')
     ->get()
@@ -64,10 +77,14 @@ $salesLast7 = DB::table('orders')
             });
 
         return view('admin.Analytics', [
-            'usersLast7'  => $usersLast7,
-            'salesLast7'  => $salesLast7,
-            'shipping'    => $shipping,
-            'topProducts' => $topProducts,
+                    'usersLast7'      => $usersLast7,
+                    'salesLast7'      => $salesLast7,
+                    'shipping'        => $shipping,
+                    'topProducts'     => $topProducts,
+                    'totalUsers'      => $totalUsers,
+                    'totalRevenue'    => $totalRevenue,
+                    'avgOrder'        => $avgOrder,
+                    'conversionRate'  => $conversionRate,
         ]);
     }
 }

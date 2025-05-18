@@ -33,7 +33,17 @@ class CartController extends Controller
             ]);
         }
 
-        return redirect()->route('store.index')->with('success', 'Item added to cart!');
+        // Calculate new cart count (assuming user is authenticated)
+        $cartCount = auth()->user()->cart?->items->sum('quantity') ?? 0;
+
+        if ($request->ajax()) {
+            return response()->json([
+                'message' => 'Product added to cart!',
+                'cart_count' => $cartCount
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Product added to cart!');
     }
 
     // View the cart items
@@ -173,37 +183,91 @@ class CartController extends Controller
     
 
 public function updateQuantity(Request $request, $itemId)
-    {
-        $request->validate([
-            'quantity' => 'required|integer|min:1'
+{
+    $request->validate([
+        'quantity' => 'required|integer|min:1'
+    ]);
+
+    $user = Auth::user();
+    $cart = $user->cart;
+    $item = $cart->items()->where('id', $itemId)->firstOrFail();
+
+    $item->update(['quantity' => $request->quantity]);
+
+    $cartCount = $cart->items->sum('quantity');
+    $cartTotal = $cart->items->sum(function($i) {
+        return $i->quantity * ($i->product->sale && $i->product->sale->isActive() ? $i->product->discounted_price : $i->product->price);
+    });
+
+    if ($request->ajax()) {
+        return response()->json([
+            'success' => true,
+            'cart_count' => $cartCount,
+            'cart_total' => number_format($cartTotal, 2),
+            'item_subtotal' => number_format(
+                $item->quantity * ($item->product->sale && $item->product->sale->isActive() ? $item->product->discounted_price : $item->product->price),
+                2
+            )
         ]);
-
-        $user = Auth::user();
-        $cart = $user->cart;
-        $item = $cart->items()->where('id', $itemId)->firstOrFail();
-
-        $item->update(['quantity' => $request->quantity]);
-
-        return redirect()->route('cart.view')
-                         ->with('success', 'Quantity updated!');
     }
 
-    /**
-     * Remove a single item from the cart.
-     */
-    public function removeItem($itemId)
+    return redirect()->route('cart.view')
+                     ->with('success', 'Quantity updated!');
+}
+
+public function removeItem(Request $request, $itemId)
+{
+    $user = Auth::user();
+    $cart = $user->cart;
+    $item = $cart->items()->where('id', $itemId)->firstOrFail();
+    $item->delete();
+
+    $cartCount = $cart->items->sum('quantity');
+    $cartTotal = $cart->items->sum(function($i) {
+        return $i->quantity * ($i->product->sale && $i->product->sale->isActive() ? $i->product->discounted_price : $i->product->price);
+    });
+
+    if ($request->ajax()) {
+        return response()->json([
+            'success' => true,
+            'cart_count' => $cartCount,
+            'cart_total' => number_format($cartTotal, 2),
+            'item_id' => $itemId
+        ]);
+    }
+
+    return redirect()->route('cart.view')
+                     ->with('success', 'Item removed from cart.');
+}
+
+    public function add(Request $request, Product $product)
     {
-        $user = Auth::user();
-        $cart = $user->cart;
-        $item = $cart->items()->where('id', $itemId)->firstOrFail();
+        try {
+            $quantity = $request->input('quantity', 1);
+            
+            // Get or create cart for authenticated user
+            $cart = auth()->user()->cart ?? auth()->user()->cart()->create();
+            
+            // Add or update item in cart
+            $cart->items()->updateOrCreate(
+                ['product_id' => $product->id],
+                ['quantity' => $quantity]
+            );
 
-        $item->delete();
+            // Get updated cart count
+            $cartCount = $cart->items->sum('quantity');
 
-        return redirect()->route('cart.view')
-                         ->with('success', 'Item removed from cart.');
+            return response()->json([
+                'success' => true,
+                'message' => 'Product added to cart successfully',
+                'cartCount' => $cartCount
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to add product to cart'
+            ], 500);
+        }
     }
-
-
-    
 }
 

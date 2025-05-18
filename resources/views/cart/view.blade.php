@@ -51,10 +51,10 @@
                   </thead>
                   <tbody>
                     @foreach($cartItems as $item)
-                      <tr>
+                      <tr data-item-id="{{ $item->id }}">
                         <td class="align-middle">{{ $item->product->name }}</td>
                         <td class="align-middle text-center">
-                          <form action="{{ route('cart.updateQuantity', $item->id) }}" method="POST" class="form-inline justify-content-center">
+                          <form class="cart-qty-form form-inline justify-content-center">
                             @csrf
                             <input type="number"
                                    name="quantity"
@@ -74,7 +74,7 @@
                             ${{ number_format($item->product->price, 2) }}
                           @endif
                         </td>
-                        <td class="align-middle text-right">
+                        <td class="align-middle text-right item-subtotal">
                           @if($item->product->sale && $item->product->sale->isActive())
                             ${{ number_format($item->quantity * $item->product->discounted_price, 2) }}
                           @else
@@ -82,7 +82,7 @@
                           @endif
                         </td>
                         <td class="align-middle text-center">
-                          <form action="{{ route('cart.removeItem', $item->id) }}" method="POST">
+                          <form class="cart-remove-form d-inline">
                             @csrf
                             @method('DELETE')
                             <button class="btn btn-sm btn-danger">
@@ -103,7 +103,7 @@
                 <div class="row">
                   <div class="col-sm-6">
                     <h5 class="mb-0">Total:
-                      <span class="float-right">
+                      <span id="cart-total" class="float-right">
                         ${{ number_format($cartItems->sum(fn($i) => $i->quantity * ($i->product->sale && $i->product->sale->isActive() ? $i->product->discounted_price : $i->product->price)), 2) }}
                       </span>
                     </h5>
@@ -124,3 +124,84 @@
   </section>
 </div>
 @endsection
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).on('submit', '.cart-qty-form', function(e) {
+    e.preventDefault();
+    let form = $(this);
+    let input = form.find('input[name="quantity"]');
+    let itemId = input.closest('tr').data('item-id');
+    let qty = input.val();
+
+    $.ajax({
+        url: '/cart/item/' + itemId + '/update',
+        type: 'POST',
+        data: {
+            _token: '{{ csrf_token() }}',
+            quantity: qty
+        },
+        success: function(response) {
+            if(response.success) {
+                // Update subtotal
+                form.closest('tr').find('.item-subtotal').text('$' + response.item_subtotal);
+                // Update total
+                $('#cart-total').text('$' + response.cart_total);
+                // Update floating cart badge if present
+                let badge = $('.fa-shopping-cart').siblings('.badge');
+                if (badge.length) {
+                    if (response.cart_count > 0) {
+                        badge.text(response.cart_count);
+                    } else {
+                        badge.remove();
+                    }
+                }
+            }
+        },
+        error: function() {
+            alert('Could not update quantity.');
+        }
+    });
+});
+
+$(document).on('submit', '.cart-remove-form', function(e) {
+    e.preventDefault();
+    if (!confirm('Remove this item from cart?')) return;
+    let form = $(this);
+    let row = form.closest('tr');
+    let itemId = row.data('item-id');
+
+    $.ajax({
+        url: '/cart/item/' + itemId,
+        type: 'DELETE',
+        data: {
+            _token: '{{ csrf_token() }}'
+        },
+        success: function(response) {
+            if(response.success) {
+                row.remove();
+                // Update total
+                $('#cart-total').text('$' + response.cart_total);
+                // Update floating cart badge if present
+                let badge = $('.fa-shopping-cart').siblings('.badge');
+                if (badge.length) {
+                    if (response.cart_count > 0) {
+                        badge.text(response.cart_count);
+                    } else {
+                        badge.remove();
+                    }
+                }
+                // If cart is empty, show empty message
+                if ($('tbody tr').length === 0) {
+                    $('.table').remove();
+                    $('.card-body').html('<p class="text-center py-4">Your cart is empty.</p>');
+                    $('.card-footer').remove();
+                }
+            }
+        },
+        error: function() {
+            alert('Could not remove item.');
+        }
+    });
+});
+</script>

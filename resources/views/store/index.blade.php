@@ -4,7 +4,7 @@
 
 @section('content')
 @php use Illuminate\Support\Facades\Storage; @endphp
-<div class="content-wrapper">
+
   <section class="content-header">
     <div class="container-fluid">
       <h1 class="mb-3">Product Catalog</h1>
@@ -12,7 +12,7 @@
   </section>
 
 <!-- Filter Bar -->
-<div class="card mb-4" style="border-color: #00c2ed;">
+  <div class="card mb-4" style="border-color: #00c2ed;">
   <div class="card-header" style="background-color: #00c2ed; padding: .5rem 1rem;">
     <div class="d-flex align-items-center justify-content-between">
       <!-- Search -->
@@ -129,66 +129,65 @@
               </button>
             </form>
 
-            <a href="{{ route('products.show', $product->id) }}" class="text-decoration-none text-dark stretched-link">
-              <!-- Product Image -->
+            <!-- Product Image with Link -->
+            <a href="{{ route('products.show', $product->id) }}" class="text-decoration-none">
               <div class="card-img-top overflow-hidden" style="height:180px;">
                 <img src="{{ Storage::url($product->image) }}"
                      alt="{{ $product->name }}"
                      class="w-100"
                      style="object-fit: cover; height: 100%;" />
               </div>
-
-              <div class="card-body d-flex flex-column">
-                <h6 class="card-title">{{ Str::limit($product->name, 30) }}</h6>
-                <p class="text-muted flex-grow-1 small">
-                  {{ Str::limit($product->description, 60) }}
-                </p>
-
-                <!-- Average Rating -->
-                @php
-                  $avg = round($product->reviews()->avg('rating') ?? 0, 1);
-                @endphp
-                <div class="mb-1">
-                  @for ($i = 1; $i <= 5; $i++)
-                    @if($i <= $avg)
-                      <i class="fas fa-star text-warning"></i>
-                    @elseif($i - $avg < 1)
-                      <i class="fas fa-star-half-alt text-warning"></i>
-                    @else
-                      <i class="far fa-star text-warning"></i>
-                    @endif
-                  @endfor
-                  <small class="text-muted">({{ number_format($avg, 1) }})</small>
-                </div>
-
-                <div class="mt-auto d-flex justify-content-between align-items-center">
-                  @if($product->sale && $product->sale->isActive())
-                    <div>
-                      <span class="font-weight-bold text-danger">
-                        ${{ number_format($product->discounted_price, 2) }}
-                      </span>
-                      <small class="text-muted"><s>
-                        ${{ number_format($product->price, 2) }}
-                      </s></small>
-                    </div>
-                  @else
-                    <span class="font-weight-bold text-primary">
-                      ${{ number_format($product->price, 2) }}
-                    </span>
-                  @endif
-                </div>
-              </div>
             </a>
 
-            <!-- Add to Cart Button -->
-            <div class="position-absolute" style="bottom: 10px; right: 10px;">
-              <form action="{{ route('cart.add', $product->id) }}" method="POST">
-                @csrf
-                <button type="submit" class="btn btn-sm btn-success">
-                  <i class="fas fa-cart-plus"></i>
-                </button>
-              </form>
+            <div class="card-body d-flex flex-column">
+              <h6 class="card-title">{{ Str::limit($product->name, 30) }}</h6>
+              <p class="text-muted flex-grow-1 small">
+                {{ Str::limit($product->description, 60) }}
+              </p>
+
+              <!-- Average Rating -->
+              @php
+                $avg = round($product->reviews()->avg('rating') ?? 0, 1);
+              @endphp
+              <div class="mb-1">
+                @for ($i = 1; $i <= 5; $i++)
+                  @if($i <= $avg)
+                    <i class="fas fa-star text-warning"></i>
+                  @elseif($i - $avg < 1)
+                    <i class="fas fa-star-half-alt text-warning"></i>
+                  @else
+                    <i class="far fa-star text-warning"></i>
+                  @endif
+                @endfor
+                <small class="text-muted">({{ number_format($avg, 1) }})</small>
+              </div>
+
+              <div class="mt-auto d-flex justify-content-between align-items-center">
+                @if($product->sale && $product->sale->isActive())
+                  <div>
+                    <span class="font-weight-bold text-danger">
+                      ${{ number_format($product->discounted_price, 2) }}
+                    </span>
+                    <small class="text-muted"><s>
+                      ${{ number_format($product->price, 2) }}
+                    </s></small>
+                  </div>
+                @else
+                  <span class="font-weight-bold text-primary">
+                    ${{ number_format($product->price, 2) }}
+                  </span>
+                @endif
+              </div>
             </div>
+
+            <!-- Add to Cart Button -->
+                    <div class="position-absolute" style="bottom: 10px; right: 10px;">
+              <button type="button"
+                      class="btn btn-sm btn-success add-to-cart-btn"
+                      data-product-id="{{ $product->id }}">
+                  <i class="fas fa-cart-plus"></i>
+              </button>
+          </div>
 
           </div>
         </div>
@@ -233,4 +232,44 @@
     @endif
   @endauth
 </a>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).on('click', '.add-to-cart-btn', function(e) {
+    e.preventDefault();
+    let btn = $(this);
+    let productId = btn.data('product-id');
+    $.ajax({
+        url: '/cart/' + productId + '/add',
+        type: 'POST',
+        data: {
+            _token: '{{ csrf_token() }}'
+        },
+        success: function(response) {
+            btn.removeClass('btn-success').addClass('btn-secondary').prop('disabled', true);
+            btn.html('<i class="fas fa-check"></i>');
+            // Update cart count badge
+            let badge = $('.fa-shopping-cart').siblings('.badge');
+            if (badge.length) {
+                if (response.cart_count > 0) {
+                    badge.text(response.cart_count);
+                } else {
+                    badge.remove();
+                }
+            } else if (response.cart_count > 0) {
+                // If badge doesn't exist, add it
+                $('.fa-shopping-cart').parent().append(
+                    '<span class="badge badge-pill position-absolute" style="top:-6px; right:-6px; font-size:0.75rem; background-color:red; color:white;">' +
+                    response.cart_count +
+                    '</span>'
+                );
+            }
+            // Optionally show a toast or alert
+        },
+        error: function(xhr) {
+            alert('Could not add to cart. Please login or try again.');
+        }
+    });
+});
+</script>
 @endsection

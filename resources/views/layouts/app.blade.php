@@ -87,8 +87,9 @@
                   <a class="dropdown-item" href="{{ url('/dashboard') }}">
                     {{ __('Dashboard') }}
                   </a>
-                  <a class="dropdown-item" href="#">
-                    {{ __('Account Settings') }}
+                  <a class="dropdown-item" href="/profile">
+                    {{ __('Profile') }}
+                    
                   </a>
                   <div class="dropdown-divider"></div>
                   <a class="dropdown-item" href="{{ route('logout') }}"
@@ -112,5 +113,6 @@
       @yield('content')
     </main>
   </div>
+    @stack('scripts')
 </body>
 </html>

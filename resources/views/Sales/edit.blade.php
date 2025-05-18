@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layout')
 @section('header','Edit Sale')
 @section('content')
   <form action="{{ route('sales.update', $sale->id) }}" method="POST">

@@ -148,13 +148,13 @@
                     <img src="{{ asset('vendor/adminlte/dist/img/user1-128x128.jpg') }}" class="img-circle elevation-2" alt="User Image">
                 </div>
                 <div class="info">
-                    <a href="{{ route('dashboard') }}" class="d-block">{{ Auth::user()->name }}</a>
+                    <a href="{{ route('profile.edit') }}" class="d-block">{{ Auth::user()->name }}</a>
                 </div>
             </div>
 
          <!-- Sidebar Menu -->
 <nav class="mt-2">
-  <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
+  <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 
     <!-- Dashboard -->
     <li class="nav-item">
@@ -179,31 +179,68 @@
         <p>Orders</p>
       </a>
     </li>
+
+    <!-- Sales -->
     <li class="nav-item">
       <a href="{{ route('sales.index') }}" class="nav-link {{ request()->routeIs('sales.index') ? 'active' : '' }}">
         <i class="nav-icon fas fa-percent"></i>
         <p>Sales</p>
       </a>
     </li>
-    
-    <li class="nav-item">
-  <a href="{{ route('categories.index') }}" class="nav-link {{ request()->routeIs('categories.index') ? 'active' : '' }}">
-    <i class="nav-icon fas fa-tags"></i>
-    <p>Categories</p>
-  </a>
-</li>
 
-
-    <!-- Products -->
-    <li class="nav-item">
-      <a href="{{ route('products.index') }}" class="nav-link {{ request()->routeIs('products.index') ? 'active' : '' }}">
+    <!-- Categories with children -->
+    <li class="nav-item has-treeview {{ request()->is('categories*') ? 'menu-open' : '' }}">
+      <a href="#" class="nav-link {{ request()->is('categories*') ? 'active' : '' }}">
         <i class="nav-icon fas fa-tags"></i>
-        <p>Products</p>
+        <p>
+          Categories
+          <i class="right fas fa-angle-left"></i>
+        </p>
       </a>
+      <ul class="nav nav-treeview ps-3">
+        <li class="nav-item">
+          <a href="{{ route('categories.index') }}" class="nav-link {{ request()->routeIs('categories.index') ? 'active' : '' }}">
+            <i class="far fa-circle nav-icon"></i>
+            <p>All Categories</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{{ route('categories.create') }}" class="nav-link {{ request()->routeIs('categories.create') ? 'active' : '' }}">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Add Category</p>
+          </a>
+        </li>
+      </ul>
+    </li>
+
+    <!-- Products with children -->
+    <li class="nav-item has-treeview {{ request()->is('products*') ? 'menu-open' : '' }}">
+      <a href="#" class="nav-link {{ request()->is('products*') ? 'active' : '' }}">
+        <i class="nav-icon fas fa-boxes"></i>
+        <p>
+          Products
+          <i class="right fas fa-angle-left"></i>
+        </p>
+      </a>
+      <ul class="nav nav-treeview ps-3">
+        <li class="nav-item">
+          <a href="{{ route('products.index') }}" class="nav-link {{ request()->routeIs('products.index') ? 'active' : '' }}">
+            <i class="far fa-circle nav-icon"></i>
+            <p>All Products</p>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a href="{{ route('products.create') }}" class="nav-link {{ request()->routeIs('products.create') ? 'active' : '' }}">
+            <i class="far fa-circle nav-icon"></i>
+            <p>Add Product</p>
+          </a>
+        </li>
+      </ul>
     </li>
 
   </ul>
 </nav>
+
 <!-- /.sidebar-menu -->
 
         </div>
@@ -213,14 +250,9 @@
 
     <!-- Content Wrapper -->
     <div class="content-wrapper">
-        <!-- Content Header -->
-        <section class="content-header">
-            <div class="container-fluid px-0">
-                <div class="row mb-2">
-                    <div class="col-sm-6"><h1>@yield('header', 'Dashboard')</h1></div>
-                </div>
-            </div>
-        </section>
+ 
+<!-- Spacer -->
+<div style="height: 50px;"></div>
 
         <!-- Main Content -->
         <section class="content">

@@ -1,155 +1,140 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Product;
 use App\Models\Category;
-
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of products with search & sorting.
      */
     public function index(Request $request)
-{
-    // Initialize query
-    $query = Product::query();
+    {
+        $query = Product::query();
 
-    // Handle Search
-    if ($request->has('search') && !empty($request->search)) {
-        $search = $request->search;
-        $query->where('name', 'like', '%' . $search . '%');
+        // Search by name (case insensitive)
+        if ($search = $request->input('search')) {
+            $query->where('name', 'LIKE', "%{$search}%");
+        }
+
+        // Validate sort inputs for security & prevent injection
+        $allowedSorts = ['name', 'price', 'stock', 'created_at'];
+        $sortBy = in_array($request->input('sort_by'), $allowedSorts) ? $request->input('sort_by') : 'name';
+
+        $sortDirection = $request->input('sort_direction') === 'desc' ? 'desc' : 'asc';
+
+        $products = $query->orderBy($sortBy, $sortDirection)->paginate(15)->withQueryString();
+
+        // Pass current filters & sorting so UI can maintain state
+        return view('products.index', compact('products', 'sortBy', 'sortDirection', 'search'));
     }
 
-    // Handle Sorting
-    $sortBy = $request->get('sort_by', 'name'); // Default sort by 'name'
-    $sortDirection = $request->get('sort_direction', 'asc'); // Default to ascending order
-
-    // Apply sorting to the query before fetching products
-    $query->orderBy($sortBy, $sortDirection);
-
-    // Fetch products with applied search and sorting
-    $products = $query->get();
-
-    // Return the view with products, sorting parameters
-    return view('products.index', compact('products', 'sortBy', 'sortDirection'));
-}
-
-
-
     /**
-     * Show the form for creating a new resource.
+     * Show form for creating a new product.
      */
     public function create()
     {
-        $categories = Category::all(); // Fetch all categories
-        return view('products.create', compact('categories')); // Pass categories to the view
+        $categories = Category::all();
+        return view('products.create', compact('categories'));
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created product in storage.
      */
     public function store(Request $request)
     {
-        // Validate the request data
-        $request->validate([
+        // Validate inputs strictly
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
-            'image'=> 'nullable|image|mimes:jpg,png,jpeg|max:2028',
+            'image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
         ]);
-        $imagePath = null;
 
+        // Handle image upload safely
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('productImg', 'public');
+            $validated['image'] = $request->file('image')->store('productImg', 'public');
         }
-    
 
-        // Create the product
-        Product::create([
-            'name' => $request->name,
-            'description' => $request->description,
-            'price' => $request->price,
-            'stock' => $request->stock,
-            'category_id' =>$request->category_id,
-            'image' => $imagePath,
-        ]);
+        Product::create($validated);
 
-        // success message
         return redirect()->route('products.index')->with('success', 'Product created successfully!');
     }
 
     /**
-     * Display the specified resource.
+     * Display a specific product and its reviews.
      */
-  public function show(Product $product)
-{
-    $product->load(['reviews.user']); 
-    return view('products.show', compact('product'));
-}
+    public function show(Product $product)
+    {
+        $product->load('reviews.user');  // Eager load reviews and users for fewer queries
+        return view('products.show', compact('product'));
+    }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing a product.
      */
-    public function edit(string $id)
-    { 
-        // Retrieve the product by its ID or fail with a 404 error if not found
-        $product = Product::findOrFail($id);
-    
-        // Retrieve all categories for the dropdown
+    public function edit(Product $product)
+    {
         $categories = Category::all();
-    
-        // Pass both the product and categories to the view
         return view('products.edit', compact('product', 'categories'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified product.
      */
-    public function update(Request $request, string $id)
-    { 
-    // Validate the request data (include all necessary fields and rules)
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'description' => 'required|string', // Added missing description validation
-        'price' => 'required|numeric|min:0', // Added min:0 to match store validation
-        'stock' => 'required|integer|min:0', // Added min:0 to match store validation
-        'category_id' => 'required|exists:categories,id',
-        'image' => 'nullable|image|mimes:jpg,png,jpeg', // Added image validation
-    ]);
+    public function update(Request $request, Product $product)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:0',
+            'stock' => 'required|integer|min:0',
+            'category_id' => 'required|exists:categories,id',
+            'image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
+        ]);
 
-    $product = Product::findOrFail($id);
+        // If new image uploaded, delete old one to save storage, then store new
+        if ($request->hasFile('image')) {
+            if ($product->image && Storage::disk('public')->exists($product->image)) {
+                Storage::disk('public')->delete($product->image);
+            }
+            $validated['image'] = $request->file('image')->store('productImg', 'public');
+        }
 
-    // Handle image upload
-    if ($request->hasFile('image')) {
-        // Store new image
-        $imagePath = $request->file('image')->store('productImg', 'public');
-      
-        $product->image = $imagePath;
-    }
-
-    // Update product fields
-    $product->name = $request->name;
-    $product->description = $request->description;
-    $product->price = $request->price;
-    $product->stock = $request->stock;
-    $product->category_id = $request->category_id;
-    $product->save();
+        $product->update($validated);
 
         return redirect()->route('products.index')->with('success', 'Product updated successfully!');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove a product from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Product $product)
     {
-        $product = Product::findOrFail($id);
+        // Delete product image if exists
+        if ($product->image && Storage::disk('public')->exists($product->image)) {
+            Storage::disk('public')->delete($product->image);
+        }
+
         $product->delete();
 
         return redirect()->route('products.index')->with('success', 'Product deleted successfully!');
+    }
+
+    public function addToCart(Request $request, $productId)
+    {
+        // ...existing add to cart logic...
+
+        if ($request->ajax()) {
+            return response()->json(['message' => 'Product added to cart!']);
+        }
+
+        return redirect()->back()->with('success', 'Product added to cart!');
     }
 }
