@@ -42,6 +42,7 @@ Route::middleware(['auth', 'checkrole:admin'])->group(function () {
      Route::get('/admin/analytics', [AnalyticsController::class, 'index'])
      ->name('admin.analytics');
 
+Route::post('/orders/bulk-action', [OrderController::class, 'bulkAction'])->name('orders.bulkAction');
 
 });
 

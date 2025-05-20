@@ -18,25 +18,34 @@ class OrderController extends Controller
     {
         $sort = $request->get('sort', 'created_at');
         $direction = $request->get('direction', 'desc');
+        $status = $request->get('status'); // new
     
         // Base query with eager loading
         $query = Order::with(['user', 'orderItems.product', 'shippingAddress']);
     
+        if ($status) {
+            $query->where('status', $status);
+        }
+
         // Sorting by user name
         if ($sort === 'user') {
-            $query->leftJoin('users', 'orders.user_id', '=', 'users.id')  // leftJoin ensures we don't lose orders with no users
-                  ->orderBy('users.name', $direction)
-                  ->addSelect('orders.*'); // Ensure we keep the full order data
+            // Use a subquery to sort by user name
+            $query->orderBy(
+                User::select('name')
+                    ->whereColumn('users.id', 'orders.user_id')
+                    ->take(1),
+                $direction
+            );
         } else {
             // Apply sorting based on other fields (status, total, created_at)
             $query->orderBy($sort, $direction);
         }
 
         // Paginate results and preserve sorting parameters
-        $orders = $query->paginate(10)->appends(compact('sort', 'direction'));
+        $orders = $query->paginate(10)->appends(compact('sort', 'direction', 'status'));
 
         // Return the view with the sorted orders
-        return view('orders.index', compact('orders', 'sort', 'direction'));
+        return view('orders.index', compact('orders', 'sort', 'direction', 'status'));
     }
 
     /**
@@ -55,7 +64,7 @@ class OrderController extends Controller
         return view('orders.show', compact('order'));
     }
 
-    /**
+ /**
      * Mark an order as accepted (shipping in progress).
      *
      * @param Order $order
@@ -84,4 +93,21 @@ class OrderController extends Controller
             ->route('orders.show', $order)
             ->with('error', 'Order has been declined.');
     }
+    
+    public function bulkAction(Request $request)
+{
+    $request->validate([
+        'order_ids' => 'required|array',
+        'action' => 'required|in:accept,decline',
+    ]);
+    $orders = Order::whereIn('id', $request->order_ids)->get();
+    foreach ($orders as $order) {
+        if ($request->action === 'accept') {
+            $order->update(['status' => Order::STATUS_SHIPPING_IN_PROGRESS]);
+        } else {
+            $order->update(['status' => Order::STATUS_DECLINED]);
+        }
+    }
+    return redirect()->route('orders.index')->with('success', 'Bulk action completed.');
+}
 }

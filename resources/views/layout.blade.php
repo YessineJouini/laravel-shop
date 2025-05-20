@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ config('app.name', 'HyperByte') }} – @yield('title', 'Dashboard')</title>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" rel="stylesheet">
     <link href="{{ asset('assets/img/Logo.ico') }}" rel="icon">
@@ -293,7 +293,7 @@
 <script src="{{ asset('vendor/overlayScrollbars/js/jquery.overlayScrollbars.min.js') }}"></script>
 <script src="{{ asset('vendor/plugins/chart.js/chart.min.js') }}"></script>
 <script src="{{ asset('vendor/adminlte/dist/js/adminlte.min.js') }}"></script>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <!-- OPTIONAL PLUGINS -->
 <script src="{{ asset('vendor/plugins/moment/moment.min.js') }}"></script>
 <script src="{{ asset('vendor/plugins/daterangepicker/daterangepicker.js') }}"></script>
