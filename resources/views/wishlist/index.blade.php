@@ -77,16 +77,16 @@ $(document).on('click', '.add-to-cart-btn', function(e) {
         success: function(response) {
             btn.removeClass('btn-success').addClass('btn-secondary').prop('disabled', true);
             btn.html('<i class="fas fa-check"></i> Added');
-            // Optionally update cart badge
+            
             let badge = $('.fa-shopping-cart').siblings('.badge');
-            if (badge.length) {
+         if (badge.length) {
                 if (response.cart_count > 0) {
                     badge.text(response.cart_count);
                 } else {
                     badge.remove();
                 }
-            } else if (response.cart_count > 0) {
-                $('.fa-shopping-cart').parent().append(
+           } else if (response.cart_count > 0) {
+               $('.fa-shopping-cart').parent().append(
                     '<span class="badge badge-pill position-absolute" style="top:-6px; right:-6px; font-size:0.75rem; background-color:red; color:white;">' +
                     response.cart_count +
                     '</span>'

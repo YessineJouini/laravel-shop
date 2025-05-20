@@ -55,7 +55,7 @@ class CartController extends Controller
         return view('cart.view', compact('cartItems'));
     }
 
-    // Show checkout form (shipping details + payment options)
+    // Show checkout form 
     public function showCheckoutForm()
     {
         $user = Auth::user();
@@ -71,7 +71,7 @@ class CartController extends Controller
         return view('cart.checkout', compact('cartItems', 'total' , 'addresses'));
     }
 
-    // Finalize checkout: Create order, save address, and process payment
+    // Finalize checkou
     public function checkout(Request $request)
     {
         $user = auth()->user();
@@ -89,14 +89,12 @@ class CartController extends Controller
             'payment_method'   => 'required|in:cash_on_delivery,card',
         ];
     
-        // If user picked Card, require valid card fields
         if ($request->input('payment_method') === 'card') {
             $rules['card_number']      = 'required|digits:16';
             $rules['card_expiry_date'] = 'required|date_format:m/y';
             $rules['card_cvc']         = 'required|digits:3';
         }
     
-        // If no saved address is chosen, require a new one
         if (! $request->filled('saved_address_id')) {
             $rules['line1']   = 'required|string|max:255';
             $rules['line2']   = 'nullable|string|max:255';
@@ -108,7 +106,6 @@ class CartController extends Controller
         // Validate
         $validated = $request->validate($rules);
     
-        // Wrap in transaction
         DB::transaction(function () use ($user, $cart, $validated, &$order) 
         {
     
@@ -139,7 +136,6 @@ class CartController extends Controller
                 'shipping_address_id' => $address->id,
             ]);
     
-            // 3) Optional: record payment
             \App\Models\Payment::create([
                 'order_id'      => $order->id,
                 'method'        => $validated['payment_method'],

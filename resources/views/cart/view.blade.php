@@ -15,7 +15,7 @@
   <section class="content">
     <div class="container-fluid">
 
-      <!-- Flash messages -->
+     
       @foreach (['success','error'] as $msg)
         @if(session($msg))
           <div class="alert alert-{{ $msg }} alert-dismissible">
@@ -29,12 +29,11 @@
         <div class="col-12">
           <div class="card card-outline card-primary mb-4">
 
-            <!-- Card Header -->
+           
             <div class="card-header">
               <h3 class="card-title">Shopping Cart</h3>
             </div>
 
-            <!-- Card Body -->
             <div class="card-body p-0">
               @if($cartItems->isEmpty())
                 <p class="text-center py-4">Your cart is empty.</p>
@@ -97,7 +96,7 @@
               @endif
             </div>
 
-            <!-- Card Footer -->
+           
             @if(! $cartItems->isEmpty())
               <div class="card-footer">
                 <div class="row">
@@ -147,7 +146,7 @@ $(document).on('submit', '.cart-qty-form', function(e) {
                 form.closest('tr').find('.item-subtotal').text('$' + response.item_subtotal);
                 // Update total
                 $('#cart-total').text('$' + response.cart_total);
-                // Update floating cart badge if present
+                
                 let badge = $('.fa-shopping-cart').siblings('.badge');
                 if (badge.length) {
                     if (response.cart_count > 0) {
@@ -182,7 +181,7 @@ $(document).on('submit', '.cart-remove-form', function(e) {
                 row.remove();
                 // Update total
                 $('#cart-total').text('$' + response.cart_total);
-                // Update floating cart badge if present
+           
                 let badge = $('.fa-shopping-cart').siblings('.badge');
                 if (badge.length) {
                     if (response.cart_count > 0) {
@@ -191,7 +190,7 @@ $(document).on('submit', '.cart-remove-form', function(e) {
                         badge.remove();
                     }
                 }
-                // If cart is empty, show empty message
+              
                 if ($('tbody tr').length === 0) {
                     $('.table').remove();
                     $('.card-body').html('<p class="text-center py-4">Your cart is empty.</p>');

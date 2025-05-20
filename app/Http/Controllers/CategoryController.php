@@ -19,7 +19,6 @@ class CategoryController extends Controller
 
         $categories = $query->orderBy('name')->paginate(10);
 
-        // Append search query to pagination links
         $categories->appends(['search' => $search]);
 
         return view('categories.index', compact('categories', 'search'));
