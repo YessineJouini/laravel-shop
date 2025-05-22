@@ -178,6 +178,11 @@
                   </span>
                 @endif
               </div>
+              @if($product->stock < 10 && $product->stock > 0)
+                <div class="mt-1">
+                  <span class="badge bg-danger text-white" style="font-size: 0.75rem;">Few units left</span>
+                </div>
+              @endif
             </div>
 
             <!-- Add to Cart Button -->
@@ -248,7 +253,7 @@ $(document).on('click', '.add-to-cart-btn', function(e) {
         success: function(response) {
             btn.removeClass('btn-success').addClass('btn-secondary').prop('disabled', true);
             btn.html('<i class="fas fa-check"></i>');
-            // Update cart count badge
+            // Update cart 
             let badge = $('.fa-shopping-cart').siblings('.badge');
             if (badge.length) {
                 if (response.cart_count > 0) {
@@ -257,14 +262,14 @@ $(document).on('click', '.add-to-cart-btn', function(e) {
                     badge.remove();
                 }
             } else if (response.cart_count > 0) {
-                // If badge doesn't exist, add it
+                
                 $('.fa-shopping-cart').parent().append(
                     '<span class="badge badge-pill position-absolute" style="top:-6px; right:-6px; font-size:0.75rem; background-color:red; color:white;">' +
                     response.cart_count +
                     '</span>'
                 );
             }
-            // Optionally show a toast or alert
+            //  alert
         },
         error: function(xhr) {
             alert('Could not add to cart. Please login or try again.');
@@ -272,5 +277,5 @@ $(document).on('click', '.add-to-cart-btn', function(e) {
     });
 });
 </script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 @endsection

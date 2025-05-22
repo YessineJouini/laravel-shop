@@ -48,6 +48,15 @@ Route::post('/orders/bulk-action', [OrderController::class, 'bulkAction'])->name
 
 // Public routes
 
+
+Route::get('/about', function () {
+    return view('about');
+})->name('about');
+
+
+
+
+
 Route::get('/salesview', [SalesController::class, 'viewSales'])->name('sales.view');
 Route::resource('store', StoreController::class)->only(['index', 'show']);
 Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');

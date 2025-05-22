@@ -5,37 +5,37 @@
     <div class="row">
         <!-- Product Details -->
         <div class="col-lg-6 mb-4">
-          <div class="border p-3 shadow-sm rounded-lg" style="max-width:600px;">
-                    <div class="ratio ratio-4x3">
-                        <img 
-                        src="{{ Storage::url($product->image) }}" 
-                        class="rounded" 
-                        alt="{{ $product->name }}" 
-                        style="object-fit: cover; width: 100%; height: 100%;">
-                    </div>
-</div>
-
+            <div class="border p-3 shadow-sm rounded-lg" style="max-width:600px;">
+                <div class="ratio ratio-4x3 product-image-zoom">
+                    <img 
+                      src="{{ Storage::url($product->image) }}" 
+                      class="rounded" 
+                      alt="{{ $product->name }}" 
+                      style="object-fit: cover; width: 100%; height: 100%;">
+                </div>
+            </div>
         </div>
         <div class="col-lg-6 mb-4">
             <div class="product-details">
                 <h1 class="display-5 fw-bold mb-3">{{ $product->name }}</h1>
                 <p class="lead mb-4">{{ $product->description }}</p>
                 
-                <div class="mt-auto d-flex justify-content-between align-items-center">
-                  @if($product->sale && $product->sale->isActive())
-                    <div>
-                      <span class="font-weight-bold text-danger">
-                        ${{ number_format($product->discounted_price, 2) }}
-                      </span>
-                      <small class="text-muted"><s>
-                        ${{ number_format($product->price, 2) }}
-                      </s></small>
-                    </div>
-                  @else
-                    <span class="font-weight-bold text-primary">
-                      ${{ number_format($product->price, 2) }}
-                    </span>
-                  @endif
+                <div class="mt-3 mb-4 d-flex align-items-center gap-3">
+                    @if($product->sale && $product->sale->isActive())
+                        <span class="h4 text-danger fw-bold">${{ number_format($product->discounted_price, 2) }}</span>
+                        <small class="text-muted text-decoration-line-through">${{ number_format($product->price, 2) }}</small>
+                    @else
+                        <span class="h4 text-primary fw-bold">${{ number_format($product->price, 2) }}</span>
+                    @endif
+                </div>
+
+                <!-- Stock Display -->
+                <div class="mb-3">
+                    @if($product->stock > 0)
+                        <span class="badge bg-success fs-6">In Stock: {{ $product->stock }}</span>
+                    @else
+                        <span class="badge bg-danger fs-6">Out of Stock</span>
+                    @endif
                 </div>
 
                 <div class="rating mb-4">
@@ -49,9 +49,9 @@
                     </div>
                 </div>
 
-                <form method="POST" action="{{ route('cart.add', $product->id) }}">
+                <form method="POST" action="{{ route('cart.add', $product->id) }}" class="mb-4">
                     @csrf
-                    <button class="btn btn-primary btn-lg">
+                    <button class="btn btn-primary btn-lg w-100" @if($product->stock == 0) disabled @endif>
                         <i class="fas fa-cart-plus me-2"></i>Add to Cart
                     </button>
                 </form>
@@ -66,27 +66,37 @@
                 <i class="fas fa-comments me-2 text-primary"></i>Customer Reviews
             </h3>
             
-            @foreach($product->reviews as $review)
-                <div class="card mb-3 shadow-sm">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center mb-2">
-                            <i class="fas fa-user-circle fa-2x text-secondary me-3"></i>
-                            <div>
-                                <strong class="fs-5">{{ $review->user->name }}</strong>
-                                <div class="text-muted small">
-                                    {{ $review->created_at->format('M d, Y') }}
-                                </div>
-                            </div>
-                        </div>
-                        <div class="rating mb-2">
-                            @for ($i = 1; $i <= 5; $i++)
-                                <i class="fa{{ $i <= $review->rating ? 's' : 'r' }} fa-star text-warning"></i>
-                            @endfor
-                        </div>
-                        <p class="mb-0">{{ $review->comment }}</p>
+           @foreach($product->reviews as $review)
+    <div class="card mb-3 shadow-sm review-card">
+        <div class="card-body">
+            <div class="d-flex align-items-center mb-2">
+                <!-- User Avatar -->
+                @if($review->user->avatar)
+                    <img src="{{ Storage::url($review->user->avatar) }}" 
+                         alt="{{ $review->user->name }}" 
+                         class="rounded-circle me-3" 
+                         style="width: 48px; height: 48px; object-fit: cover;">
+                @else
+                    <i class="fas fa-user-circle fa-2x text-secondary me-3"></i>
+                @endif
+
+                <div>
+                    <strong class="fs-5">{{ $review->user->name }}</strong>
+                    <div class="text-muted small">
+                        {{ $review->created_at->format('M d, Y') }}
                     </div>
                 </div>
-            @endforeach
+            </div>
+            <div class="rating mb-2">
+                @for ($i = 1; $i <= 5; $i++)
+                    <i class="fa{{ $i <= $review->rating ? 's' : 'r' }} fa-star text-warning"></i>
+                @endfor
+            </div>
+            <p class="mb-0">{{ $review->comment }}</p>
+        </div>
+    </div>
+@endforeach
+
         </div>
     </div>
 
@@ -117,7 +127,7 @@
                         <div class="mb-4">
                             <label for="comment" class="form-label">Comment</label>
                             <textarea name="comment" id="comment" rows="4" 
-                                class="form-control" placeholder="Share your experience..."></textarea>
+                                class="form-control" placeholder="Share your experience..." style="resize:none;"></textarea>
                         </div>
 
                         <button type="submit" class="btn btn-success btn-lg w-100">
@@ -131,8 +141,11 @@
     @else
     <div class="alert alert-info mt-4">
         <i class="fas fa-info-circle me-2"></i>
-        Please <a href="{{ route('login') }}">login</a> to leave a review.
+        Please <a href="{{ route('login') }}" class="fw-bold text-decoration-underline">login</a> to leave a review.
     </div>
     @endauth
 </div>
 @endsection
+
+
+

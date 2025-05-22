@@ -64,6 +64,12 @@ class CartController extends Controller
         if (!$cart || $cart->items->isEmpty()) {
             return redirect()->route('cart.view')->with('error', 'Your cart is empty.');
         }
+         foreach ($cart->items as $item) {
+            $product = $item->product;
+            if ($product->stock < $item->quantity) {
+                return redirect()->route('cart.view')->with('error', 'Sorry, not enough stock for "' . $product->name . '".');
+            }
+        }
 
         $cartItems = $cart->items()->with('product')->get();
         $total = $cartItems->sum(fn($item) => $item->quantity * $item->product->price);
@@ -105,7 +111,10 @@ class CartController extends Controller
     
         // Validate
         $validated = $request->validate($rules);
-    
+
+        // STOCK CHECK: Ensure all products in cart have enough stock
+       
+
         DB::transaction(function () use ($user, $cart, $validated, &$order) 
         {
     
@@ -144,7 +153,7 @@ class CartController extends Controller
                 'amount'        => $order->total,
             ]);
     
-            // 4) Copy cart items
+            // 4) Copy cart items and reduce stock
             foreach ($cart->items as $item) {
                 $order->orderItems()->create([
                     'product_id'=> $item->product_id,
@@ -153,6 +162,8 @@ class CartController extends Controller
                     ? $item->product->discounted_price 
                     : $item->product->price,
                 ]);
+                // Reduce product stock
+                $item->product->decrement('stock', $item->quantity);
             }
         
             // 5) Clear cart
