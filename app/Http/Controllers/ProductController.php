@@ -33,9 +33,7 @@ class ProductController extends Controller
         return view('products.index', compact('products', 'sortBy', 'sortDirection', 'search'));
     }
 
-    /**
-     * Show form for creating a new product.
-     */
+   
     public function create()
     {
         $categories = Category::all();
@@ -67,27 +65,21 @@ class ProductController extends Controller
         return redirect()->route('products.index')->with('success', 'Product created successfully!');
     }
 
-    /**
-     * Display a specific product and its reviews.
-     */
+    
     public function show(Product $product)
     {
-        $product->load('reviews.user');  // Eager load reviews and users for fewer queries
+        $product->load('reviews.user');  
         return view('products.show', compact('product'));
     }
 
-    /**
-     * Show the form for editing a product.
-     */
+ 
     public function edit(Product $product)
     {
         $categories = Category::all();
         return view('products.edit', compact('product', 'categories'));
     }
 
-    /**
-     * Update the specified product.
-     */
+ 
     public function update(Request $request, Product $product)
     {
         $validated = $request->validate([
@@ -112,9 +104,6 @@ class ProductController extends Controller
         return redirect()->route('products.index')->with('success', 'Product updated successfully!');
     }
 
-    /**
-     * Remove a product from storage.
-     */
     public function destroy(Product $product)
     {
         // Delete product image if exists

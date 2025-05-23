@@ -16,7 +16,7 @@
   <div class="card-header" style="background-color: #00c2ed; padding: .5rem 1rem;">
     <div class="d-flex align-items-center justify-content-between">
       <!-- Search -->
-      <div class="input-group input-group-sm w-75">
+      <form method="GET" action="{{ route('store.index') }}" class="input-group input-group-sm w-75">
         <span class="input-group-text bg-white border-0">
           <i class="fas fa-search" style="color: #00c2ed;"></i>
         </span>
@@ -27,7 +27,7 @@
           placeholder="Search..."
           value="{{ request('search') }}"
         >
-      </div>
+      </form>
 
       <!-- Toggle Filters -->
       <button

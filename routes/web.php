@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\AnalyticsController;
+use App\Http\Controllers\ChatbotController;
 
 
 // Register alias for middleware?
@@ -49,9 +50,6 @@ Route::post('/orders/bulk-action', [OrderController::class, 'bulkAction'])->name
 // Public routes
 
 
-Route::get('/about', function () {
-    return view('about');
-})->name('about');
 
 
 
@@ -72,23 +70,30 @@ Auth::routes(['verify' => true]);
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/orders/{order}',[DashboardController::class, 'showOrder'])->name('dashboard.orders.show');
-     Route::resource('reviews', ReviewController::class)->only(['store', 'update', 'destroy']);
+    Route::resource('reviews', ReviewController::class)->only(['store', 'update', 'destroy']);
     Route::post('/dashboard/address/{address?}', [DashboardController::class, 'saveAddress'])
      ->name('dashboard.address.save');
     Route::delete('/dashboard/address/{address}', [DashboardController::class, 'deleteAddress'])
      ->name('dashboard.address.delete');
      
-     Route::get('/wishlist', [WishlistController::class,'index'])->name('wishlist.index');
-     Route::post('/wishlist/toggle/{product}', [WishlistController::class,'toggle'])
+    Route::get('/wishlist', [WishlistController::class,'index'])->name('wishlist.index');
+    Route::post('/wishlist/toggle/{product}', [WishlistController::class,'toggle'])
           ->name('wishlist.toggle');
-        Route::post('/wishlist/add/{id}', [WishlistController::class, 'add'])->name('wishlist.add');
-        Route::post('/wishlist/remove/{productId}', [WishlistController::class, 'remove'])->name('wishlist.remove');
+    Route::post('/wishlist/add/{id}', [WishlistController::class, 'add'])->name('wishlist.add');
+    Route::post('/wishlist/remove/{productId}', [WishlistController::class, 'remove'])->name('wishlist.remove');
         
     Route::get('/profile', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [\App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
     Route::patch('/profile/avatar', [\App\Http\Controllers\ProfileController::class, 'updateAvatar'])->name('profile.avatar');
     Route::delete('/profile', [\App\Http\Controllers\ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::post('/chatbot', [ChatbotController::class, 'chatWithBot']);
+    
+    Route::get('/chatbot', [\App\Http\Controllers\ChatbotController::class, 'index'])->name('chatbot.index');
 });
+
+
+
+
 
     // Cart 
    

@@ -31,9 +31,7 @@ class DashboardController extends Controller
         return view('dashboard.index', compact('user','orders','addresses','layout'));
     }
 
-    /**
-     * Update or create a shipping address
-     */
+   
     public function saveAddress(Request $request, Address $address = null)
     {
         $data = $request->validate([
@@ -56,9 +54,7 @@ class DashboardController extends Controller
         return back()->with('success', 'Shipping address saved.');
     }
 
-    /**
-     * Delete a saved address
-     */
+    
     public function deleteAddress(Address $address)
     {
         $this->authorize('delete', $address);

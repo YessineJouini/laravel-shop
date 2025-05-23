@@ -14,6 +14,9 @@ This is a Laravel-based e-commerce web application built as part of a final year
 - Wishlist
 - Admin dashboard (with middleware protection)
 - Admin analytics panel 
+- AI Customer Service Chat
+
+Disclaimer: To use the chatbot feature, you must have access to an external API or run a local LLM model, as it requires a connected language model to generate responses.
 
 ---
 
@@ -27,7 +30,7 @@ Follow the steps below to set up this project on your local machine.
 ### 1. Clone the repository
 
 
-git clone https://github.com/YOUR_USERNAME/laravel-shop.git
+git clone https://github.com/YessineJouini/laravel-shop.git
 cd laravel-shop
 
 ### 2. Install PHP Dependencies
@@ -75,6 +78,8 @@ npm run dev
 php artisan serve
 ->  Visit: http://127.0.0.1:8000
  
+
+
 
  ### ROADMAP
 

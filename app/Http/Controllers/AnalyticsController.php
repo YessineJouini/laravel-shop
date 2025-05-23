@@ -15,7 +15,7 @@ class AnalyticsController extends Controller
 {
     public function index()
     {
-        // 1) New Users: daily counts for the last 7 days
+        //  New Users:
         $usersLast7 = User::select(
                 DB::raw("DATE(created_at) as date"),
 
@@ -27,19 +27,19 @@ class AnalyticsController extends Controller
             ->get()
             ->pluck('count','date');
 
-        // 2) Sales: daily sum for last 7 days
- // 2) Total Users
+        //  Sales: daily sum for last 7 days
+ //  Total Users
     $totalUsers = User::count();
 
-    // 3) Total Revenue (only from completed/shipping orders)
+    // Total Revenue (only from completed/shipping orders)
     $totalRevenue = Order::whereIn('status', ['completed', 'shipping_in_progress'])
         ->sum('total');
 
-    // 4) Average Order Value
+    // Average Order Value
     $avgOrder = Order::whereIn('status', ['completed', 'shipping_in_progress'])
         ->avg('total');
 
-    // 5) Conversion Rate (simple placeholder logic, e.g. orders / users)
+    // Conversion Rate (simple placeholder logic, e.g. orders / users)
     $totalOrders = Order::count();
     $conversionRate = $totalUsers > 0 ? round(($totalOrders / $totalUsers) * 100, 2) : 0;
 $salesLast7 = DB::table('orders')
@@ -54,17 +54,17 @@ $salesLast7 = DB::table('orders')
     ->get()
     ->mapWithKeys(function ($row) {
         return [$row->date => (float) $row->daily_total];
-    });  // Remove the ->toArray()
+    });  
 
 
-        // 3) Shipping Rate: shipped vs pending (last 30 days)
+        //  Shipping Rate: shipped vs pending (last 30 days)
         $shipping = Order::select('status', DB::raw("count(*) as count"))
             ->where('created_at','>=', now()->subDays(29)->startOfDay())
             ->groupBy('status')
             ->get()
             ->pluck('count','status');
 
-        // 4) Top Products by units sold (last 30 days)
+        // Top Products by units sold (last 30 days)
         $topProducts = OrderItem::select('product_id', DB::raw("SUM(quantity) as units"))
             ->where('created_at','>=', now()->subDays(29)->startOfDay())
             ->groupBy('product_id')

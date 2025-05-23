@@ -51,6 +51,10 @@
             <li class="nav-item">
               <a class="nav-link" href="{{ route('cart.view') }}">My Cart</a>
             </li>
+             <li class="nav-item">
+  <a class="nav-link" href="{{ route('chatbot.index') }}" style="color: #00c2ed;">ByteBuddy</a>
+</li>
+
 
             @auth
               @if(Auth::user()->isAdmin())
