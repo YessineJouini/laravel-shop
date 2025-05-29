@@ -16,7 +16,7 @@ This is a Laravel-based e-commerce web application built as part of a final year
 - Admin analytics panel 
 - AI Customer Service Chat
 
-Disclaimer: To use the chatbot feature, you must have access to an external API or run a local LLM model, as it requires a connected language model to generate responses.
+
 
 ---
 

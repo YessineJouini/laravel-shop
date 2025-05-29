@@ -89,6 +89,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/chatbot', [ChatbotController::class, 'chatWithBot']);
     
     Route::get('/chatbot', [\App\Http\Controllers\ChatbotController::class, 'index'])->name('chatbot.index');
+
+
+    
 });
 
 
