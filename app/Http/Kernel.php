@@ -70,4 +70,7 @@ class Kernel extends HttpKernel
         'checkrole' => \App\Http\Middleware\CheckRole::class,
 
     ];
+    protected $commands = [
+    \App\Console\Commands\ImportDummyMobileAccessories::class,
+];
 }

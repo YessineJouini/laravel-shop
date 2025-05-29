@@ -1,14 +1,14 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="card card-primary direct-chat direct-chat-primary">
+<div class="card card-primary direct-chat direct-chat-primary" style="height: 100vh; display: flex; flex-direction: column;">
   <div class="card-header">
     <h3 class="card-title"><i class="fas fa-robot"></i> ByteBuddy</h3>
   </div>
 
-  <div class="card-body">
+  <div class="card-body" style="flex: 1; overflow-y: hidden;">
     <!-- Chat messages -->
-    <div id="chat-messages" class="direct-chat-messages" style="max-height: 300px; overflow-y: auto;">
+    <div id="chat-messages" class="direct-chat-messages" style="height: 90%; overflow-y: auto; padding: 10px;">
       <!-- Messages will be appended here -->
     </div>
   </div>
@@ -32,6 +32,8 @@
     </form>
   </div>
 </div>
+
+
 
 <script>
   const chatMessages = document.getElementById('chat-messages');

@@ -6,13 +6,14 @@
         <!-- Product Details -->
         <div class="col-lg-6 mb-4">
             <div class="border p-3 shadow-sm rounded-lg" style="max-width:600px;">
-                <div class="ratio ratio-4x3 product-image-zoom">
-                    <img 
-                      src="{{ Storage::url($product->image) }}" 
-                      class="rounded" 
-                      alt="{{ $product->name }}" 
-                      style="object-fit: cover; width: 100%; height: 100%;">
-                </div>
+                <div class="ratio ratio-4x3 d-flex justify-content-center align-items-center bg-light product-image-zoom">
+    <img 
+        src="{{ Storage::url($product->image) }}" 
+        class="rounded" 
+        alt="{{ $product->name }}" 
+        style="max-width: 100%; max-height: 100%; object-fit: contain;">
+</div>
+
             </div>
         </div>
         <div class="col-lg-6 mb-4">

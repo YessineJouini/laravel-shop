@@ -1,11 +1,11 @@
 @extends($layout)
 @section('header', 'Products on Sale')
 @section('content')
-  <div class="content-wrapper">
+  
     <section class="content-header">
-      <div class="container-fluid">
+      
         <h1 class="text-center mb-4">Products on Sale</h1>
-      </div>
+    
     </section>
 
     <section class="content">
@@ -57,5 +57,5 @@
         </div>
       </div>
     </section>
-  </div>
+  
 @endsection

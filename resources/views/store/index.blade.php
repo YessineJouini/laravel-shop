@@ -129,15 +129,17 @@
               </button>
             </form>
 
-            <!-- Product Image with Link -->
-            <a href="{{ route('products.show', $product->id) }}" class="text-decoration-none">
-              <div class="card-img-top overflow-hidden" style="height:180px;">
-                <img src="{{ Storage::url($product->image) }}"
-                     alt="{{ $product->name }}"
-                     class="w-100"
-                     style="object-fit: cover; height: 100%;" />
-              </div>
-            </a>
+            
+           <!-- Product Image with Link -->
+<a href="{{ route('products.show', $product->id) }}" class="text-decoration-none">
+  <div class="card-img-top overflow-hidden bg-white d-flex align-items-center justify-content-center" style="height: 180px; border-radius: 0.5rem;">
+    <img src="{{ Storage::url($product->image) }}"
+         alt="{{ $product->name }}"
+         class="img-fluid"
+         style="max-height: 100%; max-width: 100%; object-fit: contain; transition: transform 0.3s ease;">
+  </div>
+</a>
+
 
             <div class="card-body d-flex flex-column">
               <h6 class="card-title">{{ Str::limit($product->name, 30) }}</h6>
