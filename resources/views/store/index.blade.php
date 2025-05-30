@@ -220,25 +220,7 @@
 </div>
 
 <!-- Floating Cart Button -->
-<a href="{{ route('cart.view') }}"
-   class="btn btn-info btn-lg rounded-circle shadow position-fixed d-flex align-items-center justify-content-center"
-   style="bottom:20px; right:20px; width:60px; height:60px;">
-  {{-- White cart icon --}}
-  <i class="fas fa-shopping-cart fa-lg text-white"></i>
 
-  @auth
-    @php
-      $count = Auth::user()->cart?->items->sum('quantity') ?? 0;
-    @endphp
-    @if($count)
-
-      <span class="badge badge-pill position-absolute"
-            style="top:-6px; right:-6px; font-size:0.75rem; background-color:red; color:white;">
-        {{ $count }}
-      </span>
-    @endif
-  @endauth
-</a>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>

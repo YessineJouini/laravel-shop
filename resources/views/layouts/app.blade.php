@@ -19,6 +19,15 @@
   <style>
     /* Push content below fixed navbar (height ~56px) */
     body { padding-top: 56px; }
+    .nav-link.active {
+  border-left: 2px solid rgb(27, 181, 247); 
+  padding-left: 0.75rem;  
+          
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;      
+      
+  font-weight: bold;
+}
   </style>
 </head>
 <body>
@@ -37,35 +46,50 @@
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
           <!-- Left Side Of Navbar -->
-          <ul class="navbar-nav me-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="{{ route('store.index') }}">Store</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link " href="{{ route('wishlist.index') }}">Wishlist</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link text-danger" href="{{ route('sales.view') }}">Sales</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{{ route('cart.view') }}">My Cart</a>
-            </li>
-             <li class="nav-item">
-  <a class="nav-link" href="{{ route('chatbot.index') }}" style="color: #00c2ed;">ByteBuddy</a>
-</li>
+     <ul class="navbar-nav me-auto">
+  <li class="nav-item">
+    <a class="nav-link {{ request()->routeIs('store.index') ? 'active' : '' }}" href="{{ route('store.index') }}">
+      Store
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
+      Dashboard
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {{ request()->routeIs('wishlist.index') ? 'active' : '' }}" href="{{ route('wishlist.index') }}">
+      Wishlist
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link text-danger {{ request()->routeIs('sales.view') ? 'active fw-bold' : '' }}" href="{{ route('sales.view') }}">
+      Sales
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {{ request()->routeIs('cart.view') ? 'active' : '' }}" href="{{ route('cart.view') }}">
+      My Cart
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {{ request()->routeIs('chatbot.index') ? 'active' : '' }}" href="{{ route('chatbot.index') }}" style="color: #00c2ed;">
+      ByteBuddy
+    </a>
+  </li>
+
+  @auth
+    @if(Auth::user()->isAdmin())
+      <li class="nav-item">
+        <a class="nav-link {{ request()->routeIs('orders.index') ? 'active' : '' }}" href="{{ route('orders.index') }}">
+          Manage Orders
+        </a>
+      </li>
+    @endif
+  @endauth
+</ul>
 
 
-            @auth
-              @if(Auth::user()->isAdmin())
-                <li class="nav-item">
-                  <a class="nav-link" href="{{ route('orders.index') }}">Manage Orders</a>
-                </li>
-              @endif
-            @endauth
-          </ul>
 
           <!-- Right Side Of Navbar -->
           <ul class="navbar-nav ms-auto">
@@ -119,7 +143,25 @@
     <main class="py-4 container">
       @yield('content')
     </main>
-  </div>
+  <a href="{{ route('cart.view') }}"
+   class="btn btn-info btn-lg rounded-circle shadow position-fixed d-flex align-items-center justify-content-center"
+   style="bottom:20px; right:20px; width:60px; height:60px;">
+  {{-- White cart icon --}}
+  <i class="fas fa-shopping-cart fa-lg text-white"></i>
+
+  @auth
+    @php
+      $count = Auth::user()->cart?->items->sum('quantity') ?? 0;
+    @endphp
+    @if($count)
+
+      <span class="badge badge-pill position-absolute"
+            style="top:-6px; right:-6px; font-size:0.75rem; background-color:red; color:white;">
+        {{ $count }}
+      </span>
+    @endif
+  @endauth
+</a>
     @stack('scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

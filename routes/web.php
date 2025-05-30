@@ -23,8 +23,9 @@ Route::aliasMiddleware('checkrole', \App\Http\Middleware\CheckRole::class);
 
 // main display
 Route::get('/', function () {
-    return Auth::check() ? redirect()->route('store.index') : redirect()->route('login');
-});
+    return view('landing');
+})->name('home');
+
 
 // Admin dashboard (
 Route::get('/admin', function () {
