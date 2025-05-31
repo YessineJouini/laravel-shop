@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
   <!-- Fonts -->
   <link rel="dns-prefetch" href="//fonts.bunny.net">
+  
   <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
       <link rel="stylesheet" href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}">
 
@@ -147,6 +148,8 @@
    class="btn btn-info btn-lg rounded-circle shadow position-fixed d-flex align-items-center justify-content-center"
    style="bottom:20px; right:20px; width:60px; height:60px;">
   {{-- White cart icon --}}
+  <!-- Footer Section -->
+
   <i class="fas fa-shopping-cart fa-lg text-white"></i>
 
   @auth
@@ -165,5 +168,6 @@
     @stack('scripts')
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
 </body>
 </html>
