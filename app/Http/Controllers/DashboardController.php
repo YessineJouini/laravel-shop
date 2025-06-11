@@ -55,13 +55,16 @@ class DashboardController extends Controller
     }
 
     
-    public function deleteAddress(Address $address)
-    {
-        $this->authorize('delete', $address);
-        $address->delete();
+    public function deleteAddress($addressId)
+{
+    $address = Address::where('id', $addressId)
+        ->where('user_id', auth()->user()->id)
+        ->firstOrFail();
 
-        return back()->with('success', 'Address removed.');
-    }
+    $address->delete();
+
+    return redirect()->route('dashboard')->with('status', 'Address deleted!');
+}
     public function showOrder(Order $order)
     {
         // Prevent users from viewing others' orders

@@ -32,6 +32,26 @@
   </style>
 </head>
 <body>
+  {{-- filepath: resources/views/layouts/app.blade.php --}}
+{{-- ...existing code... --}}
+@if (session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
+
+@if (session('status'))
+    <div class="alert alert-success">
+        {{ session('status') }}
+    </div>
+@endif
+
+@if (session('error'))
+    <div class="alert alert-danger">
+        {{ session('error') }}
+    </div>
+@endif
+{{-- ...existing code... --}}
   <div id="app">
     <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm fixed-top">
       <div class="container-fluid px-4">

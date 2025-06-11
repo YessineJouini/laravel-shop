@@ -105,16 +105,31 @@
             </li>
 
             <!-- Notifications Dropdown -->
-            <li class="nav-item dropdown">
-                <a class="nav-link" data-toggle="dropdown" href="#"><i class="far fa-bell"></i><span class="badge badge-warning navbar-badge">15</span></a>
-                <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                    <span class="dropdown-header">15 Notifications</span>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item"><i class="fas fa-envelope mr-2"></i>4 new messages<span class="float-right text-muted text-sm">3 mins</span></a>
-                    <div class="dropdown-divider"></div>
-                    <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
-                </div>
-            </li>
+   <li class="nav-item dropdown">
+    <a class="nav-link" data-toggle="dropdown" href="#">
+        <i class="far fa-bell"></i>
+        @if(isset($unreadCount) && $unreadCount > 0)
+            <span class="badge badge-warning navbar-badge">{{ $unreadCount }}</span>
+        @endif
+    </a>
+    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+        <span class="dropdown-header">{{ $unreadCount ?? 0 }} Notifications</span>
+        <div class="dropdown-divider"></div>
+
+        @foreach($notifications ?? [] as $notification)
+            <a href="{{ route('orders.show', $notification->data['order_id']) }}" class="dropdown-item">
+                <i class="fas fa-shopping-cart mr-2"></i>
+                New Order by {{ $notification->data['user_name'] }}
+                <span class="float-right text-muted text-sm">{{ \Carbon\Carbon::parse($notification->data['created_at'])->diffForHumans() }}</span>
+            </a>
+            <div class="dropdown-divider"></div>
+        @endforeach
+
+        <a href="#" class="dropdown-item dropdown-footer">See All Notifications</a>
+    </div>
+</li>
+
+
 
             <!-- Fullscreen -->
             <li class="nav-item"><a class="nav-link" data-widget="fullscreen" href="#"><i class="fas fa-expand-arrows-alt"></i></a></li>
@@ -138,7 +153,10 @@
         <!-- Brand Logo -->
         <a href="{{ route('admin.dashboard') }}" class="brand-link">
             <img src="{{ asset('vendor/adminlte/dist/img/minilogo.png') }}" alt="HyperByte Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
-            <span style="color: #00c2ed; font-weight: 700;">H</span><span style="color:rgb(255, 255, 255); font-weight:300;">yperByte</span>
+            <span class="brand-text font-weight-light d-none d-sm-inline-block">
+    <span style="color: #00c2ed; font-weight: 700;">H</span><span style="color:rgb(255, 255, 255); font-weight:300;">yperByte</span>
+</span>
+
         </a>
 
         <div class="sidebar">
@@ -302,6 +320,33 @@
 <script src="{{ asset('vendor/plugins/jqvmap/jquery.vmap.min.js') }}"></script>
 <script src="{{ asset('vendor/plugins/jqvmap/maps/jquery.vmap.usa.js') }}"></script>
 <script src="{{ asset('vendor/adminlte/dist/js/demo.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const dropdownTrigger = document.querySelector('.nav-link[data-toggle="dropdown"]');
+    
+    if (dropdownTrigger) {
+        dropdownTrigger.addEventListener('click', function () {
+            fetch("{{ route('notifications.delete') }}", {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': "{{ csrf_token() }}",
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                }
+            }).then(response => {
+                if (response.ok) {
+                    document.querySelector('.navbar-badge')?.remove();
+                    const dropdownMenu = document.querySelector('.dropdown-menu');
+                    if (dropdownMenu) {
+                        dropdownMenu.innerHTML = `<span class="dropdown-header">No new notifications</span>`;
+                    }
+                }
+            });
+        });
+    }
+});
+</script>
+
 
 @if(Route::is('admin.dashboard'))
     <script src="{{ asset('vendor/adminlte/dist/js/pages/dashboard.js') }}"></script>

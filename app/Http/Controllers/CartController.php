@@ -7,10 +7,12 @@ use App\Models\CartItem;
 use App\Models\Product;
 use App\Models\Order;
 use App\Models\Address;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Notifications\OrderPlaced;
+use App\Notifications\NewOrderNotification;
 
 class CartController extends Controller
 {
@@ -144,6 +146,10 @@ class CartController extends Controller
                 'payment_method'      => $validated['payment_method'],
                 'shipping_address_id' => $address->id,
             ]);
+            $admins = User::where('role', 'admin')->get();
+foreach ($admins as $admin) {
+    $admin->notify(new NewOrderNotification($order));
+}
     
             \App\Models\Payment::create([
                 'order_id'      => $order->id,

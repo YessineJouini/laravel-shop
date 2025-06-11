@@ -45,6 +45,10 @@ Route::middleware(['auth', 'checkrole:admin'])->group(function () {
      ->name('admin.analytics');
 
 Route::post('/orders/bulk-action', [OrderController::class, 'bulkAction'])->name('orders.bulkAction');
+  Route::post('/notifications/delete', function (Request $request) {
+    $request->user()->notifications()->delete();
+    return response()->json(['status' => 'deleted']);
+})->middleware(['auth', 'admin'])->name('notifications.delete');
 
 });
 
