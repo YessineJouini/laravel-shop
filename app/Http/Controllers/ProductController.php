@@ -12,26 +12,32 @@ class ProductController extends Controller
     /**
      * Display a listing of products with search & sorting.
      */
-    public function index(Request $request)
-    {
-        $query = Product::query();
+   public function index(Request $request)
+{
+    $query = Product::query();
 
-        // Search by name (case insensitive)
-        if ($search = $request->input('search')) {
-            $query->where('name', 'LIKE', "%{$search}%");
-        }
+    // Search by name or description 
+    if ($search = $request->input('search')) {
+    $search = strtolower($search);
+    $query->where(function ($q) use ($search) {
+        $q->whereRaw('LOWER(COALESCE(name, "")) LIKE ?', ["%{$search}%"]);
+    });
+}
 
-        // Validate sort inputs for security & prevent injection
-        $allowedSorts = ['name', 'price', 'stock', 'created_at'];
-        $sortBy = in_array($request->input('sort_by'), $allowedSorts) ? $request->input('sort_by') : 'name';
+    
 
-        $sortDirection = $request->input('sort_direction') === 'desc' ? 'desc' : 'asc';
+    
+    $allowedSorts = ['name', 'price', 'stock', 'created_at'];
+    $sortBy = in_array($request->input('sort_by'), $allowedSorts) ? $request->input('sort_by') : 'name';
+    $sortDirection = $request->input('sort_direction') === 'desc' ? 'desc' : 'asc';
 
-        $products = $query->orderBy($sortBy, $sortDirection)->paginate(15)->withQueryString();
+    // Apply sorting and paginate
+    $products = $query->orderBy($sortBy, $sortDirection)->paginate(15)->withQueryString();
 
-        // Pass current filters & sorting so UI can maintain state
-        return view('products.index', compact('products', 'sortBy', 'sortDirection', 'search'));
-    }
+    
+    return view('products.index', compact('products', 'sortBy', 'sortDirection', 'search'));
+}
+
 
    
     public function create()

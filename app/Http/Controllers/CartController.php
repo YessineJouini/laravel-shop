@@ -17,9 +17,12 @@ use App\Notifications\NewOrderNotification;
 class CartController extends Controller
 {
     // Add product to the cart
-    public function addToCart(Request $request, $productId)
-    {
-        $product = Product::findOrFail($productId);
+   public function addToCart(Request $request, $productId)
+{
+    $product = Product::findOrFail($productId);
+    
+   
+    if (Auth::check()) {
         $user = Auth::user();
         $cart = $user->cart ?? Cart::create(['user_id' => $user->id]);
 
@@ -30,54 +33,103 @@ class CartController extends Controller
         } else {
             $cart->cartItems()->create([
                 'product_id' => $productId,
-                'quantity' => 1,
+                'quantity' => $request->quantity ?? 1,
                 'user_id' => Auth::id(),
             ]);
         }
 
-        // Calculate new cart count (assuming user is authenticated)
         $cartCount = auth()->user()->cart?->items->sum('quantity') ?? 0;
-
-        if ($request->ajax()) {
-            return response()->json([
-                'message' => 'Product added to cart!',
-                'cart_count' => $cartCount
-            ]);
+    } 
+ 
+    else {
+        $cart = session()->get('guest_cart', []);
+        
+        if (isset($cart[$productId])) {
+            $cart[$productId]['quantity'] += $request->quantity ?? 1;
+        } else {
+            $cart[$productId] = [
+                'product_id' => $productId,
+                'quantity' => $request->quantity ?? 1,
+            ];
         }
-
-        return redirect()->back()->with('success', 'Product added to cart!');
+        
+        session()->put('guest_cart', $cart);
+        $cartCount = array_sum(array_column($cart, 'quantity'));
     }
 
+
+    if ($request->ajax()) {
+        return response()->json([
+            'message' => 'Product added to cart!',
+            'cart_count' => $cartCount
+        ]);
+    }
+
+    return redirect()->back()->with('success', 'Product added to cart!');
+}
+
     // View the cart items
-    public function view()
-    {
+   public function view()
+{
+    if (Auth::check()) {
+        // Existing logic for authenticated users
         $user = Auth::user();
         $cart = $user->cart;
         $cartItems = $cart ? $cart->items : collect();
-        return view('cart.view', compact('cartItems'));
+    } else {
+        // Enhanced logic for guest users
+        $guestCart = session()->get('guest_cart', []);
+        $cartItems = collect();
+        
+        if (!empty($guestCart)) {
+            $products = Product::with('sale')->findMany(array_keys($guestCart));
+            
+            foreach ($products as $product) {
+                $cartItems->push((object)[
+                    'id' => $product->id, // This is the critical missing field
+                    'product_id' => $product->id,
+                    'quantity' => $guestCart[$product->id]['quantity'],
+                    'product' => $product,
+                    // Add any other fields your view expects
+                ]);
+            }
+        }
     }
+
+    return view('cart.view', compact('cartItems'));
+}
 
     // Show checkout form 
     public function showCheckoutForm()
-    {
-        $user = Auth::user();
-        $cart = $user->cart;
-
-        if (!$cart || $cart->items->isEmpty()) {
-            return redirect()->route('cart.view')->with('error', 'Your cart is empty.');
-        }
-         foreach ($cart->items as $item) {
-            $product = $item->product;
-            if ($product->stock < $item->quantity) {
-                return redirect()->route('cart.view')->with('error', 'Sorry, not enough stock for "' . $product->name . '".');
-            }
-        }
-
-        $cartItems = $cart->items()->with('product')->get();
-        $total = $cartItems->sum(fn($item) => $item->quantity * $item->product->price);
-        $addresses = auth()->user()->addresses;
-        return view('cart.checkout', compact('cartItems', 'total' , 'addresses'));
+{
+    // Redirect guests to login page
+    if (!Auth::check()) {
+        return redirect()->route('login')->with('error', 'Please login to proceed to checkout.');
     }
+
+    $user = Auth::user();
+    $cart = $user->cart;
+
+    // Handle empty cart case
+    if (!$cart || $cart->items->isEmpty()) {
+        return redirect()->route('cart.view')->with('error', 'Your cart is empty.');
+    }
+
+    // Check stock availability
+    foreach ($cart->items as $item) {
+        $product = $item->product;
+        if ($product->stock < $item->quantity) {
+            return redirect()->route('cart.view')->with('error', 'Sorry, not enough stock for "' . $product->name . '".');
+        }
+    }
+
+    // Load cart items with products
+    $cartItems = $cart->items()->with('product')->get();
+    $total = $cartItems->sum(fn($item) => $item->quantity * $item->product->price);
+    $addresses = $user->addresses;
+
+    return view('cart.checkout', compact('cartItems', 'total', 'addresses'));
+}
 
     // Finalize checkou
     public function checkout(Request $request)
